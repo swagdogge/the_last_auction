@@ -1,7 +1,10 @@
+import { LOCAL_JURY_MAX_BID } from "./local-jury.js";
+
 export const STARTING_BID = 500000;
 
 export function fallbackVerdict(bidder) {
-  const maxBid = Math.round((bidder.budget * (0.12 + Math.random() * 0.55)) / 250000) * 250000;
+  const maxBid =
+    Math.round((LOCAL_JURY_MAX_BID * (0.12 + Math.random() * 0.55)) / 250000) * 250000;
   return {
     bidderId: bidder.id,
     reaction: "…studies the work without saying a single word.",

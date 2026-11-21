@@ -1,5 +1,5 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import PaintCanvas from "@/components/game/PaintCanvas";
 import Palette from "@/components/game/Palette";
 import BrushTools from "@/components/game/BrushTools";
@@ -14,6 +14,7 @@ import AtelierBackdrop from "@/components/game/AtelierBackdrop";
 import AuctionBackdrop from "@/components/game/AuctionBackdrop";
 import MuseumBackdrop from "@/components/game/MuseumBackdrop";
 import Easel from "@/components/game/Easel";
+import NameWorkDialog from "@/components/game/NameWorkDialog";
 import { BIDDERS, PAINTING_COUNT } from "@/lib/bidders";
 import { usePlayerKey } from "@/lib/player-key";
 import { formatMoney } from "@/lib/format";
@@ -45,29 +46,41 @@ function Game() {
   const [demoMode, setDemoMode] = useState(false);
   const [pickedPreset, setPickedPreset] = useState(null);
   const [currentPreset, setCurrentPreset] = useState(null);
+  const [currentTitle, setCurrentTitle] = useState("");
+  const [naming, setNaming] = useState(false);
   const canvasRef = useRef(null);
 
   const total = works.reduce((sum, w) => sum + w.price, 0);
+  const lotHistory = useMemo(() => works.map((work) => work.record).filter(Boolean), [works]);
 
   const handleSell = () => {
     if (demoMode) {
       if (!pickedPreset) return;
       setCurrentPreset(pickedPreset);
       setCurrentUrl(pickedPreset.url);
+      setCurrentTitle(pickedPreset.title);
       setCurrentStats(null);
       setPhase("auction");
       return;
     }
     if (!canvasRef.current) return;
+    setNaming(true);
+  };
+
+  const confirmTitle = (title) => {
+    if (!canvasRef.current) return;
+    setCurrentTitle(title.trim() || `Untitled ${works.length + 1}`);
     setCurrentUrl(canvasRef.current.toDataURL());
     setCurrentStats(canvasRef.current.analyze());
+    setNaming(false);
     setPhase("auction");
   };
 
-  const handleAuctionDone = (price) => {
-    const next = [...works, { url: currentUrl, price }];
+  const handleAuctionDone = ({ price, record }) => {
+    const next = [...works, { url: currentUrl, title: currentTitle, price, record }];
     setWorks(next);
     setCurrentUrl(null);
+    setCurrentTitle("");
     setCurrentStats(null);
     setCurrentPreset(null);
     setPickedPreset(null);
@@ -77,9 +90,11 @@ function Game() {
   const resetLife = () => {
     setWorks([]);
     setCurrentUrl(null);
+    setCurrentTitle("");
     setCurrentStats(null);
     setCurrentPreset(null);
     setPickedPreset(null);
+    setNaming(false);
   };
 
   // Starting from the title always means a real game, never a leftover demo.
@@ -216,7 +231,9 @@ function Game() {
             <AuctionBackdrop paintingUrl={currentUrl} />
             <AuctionStage
               paintingUrl={currentUrl}
+              paintingTitle={currentTitle}
               paintingIndex={works.length}
+              lotHistory={lotHistory}
               stats={currentStats}
               geminiKey={demoMode ? null : playerKey}
               demoVerdicts={currentPreset?.verdicts}
@@ -235,6 +252,14 @@ function Game() {
               onRestart={restart}
             />
           </>
+        )}
+
+        {naming && (
+          <NameWorkDialog
+            number={works.length + 1}
+            onConfirm={confirmTitle}
+            onCancel={() => setNaming(false)}
+          />
         )}
       </div>
     </div>
@@ -281,7 +306,7 @@ function TitleScreen({ onStart, onStartDemo }) {
           </button>
           <DemoButton onStart={onStartDemo} />
         </div>
-        <p className="text-center text-[11px] text-muted-foreground">
+        <p className="text-center text-[11px] text-muted-foreground [text-shadow:0_0_2px_#000,0_1px_2px_#000]">
           Vibecoded by swagdogge with Base44<br />during the &quot;Game Garage (Give(a)Go x Base44)&quot; Event<br />21.11.2026, Heilbronn<br />no squirrels harmed
         </p>
         {import.meta.env.DEV && (

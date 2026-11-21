@@ -4,6 +4,7 @@ import { formatCompact, formatMoney } from "@/lib/format";
 
 export default function AuctionRoom({
   paintingIndex,
+  title = null,
   verdicts,
   revealed,
   leaderId,
@@ -21,6 +22,7 @@ export default function AuctionRoom({
           <p className="text-[10px] uppercase tracking-[0.3em] text-foreground/60">
             Lot {paintingIndex + 1} · on the easel
           </p>
+          {title && <p className="mt-1 font-heading text-lg text-foreground/85">{title}</p>}
           {caption && (
             <p className="mt-2 text-[11px] leading-relaxed text-foreground/70">{caption}</p>
           )}

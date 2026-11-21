@@ -1,7 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { judgePaintingLocally } from "../src/lib/judging.js";
-import { BIDDER_BUDGET, BIDDERS } from "../src/lib/bidders.js";
+import { BIDDERS } from "../src/lib/bidders.js";
+import { LOCAL_JURY_MAX_BID } from "../src/lib/local-jury.js";
 
 const stats = {
   coverage: 0.42,
@@ -34,7 +35,7 @@ test("every bidder gets a complete verdict with no leftover placeholders", (t) =
       assert.equal(typeof verdict[line], "string", verdict.bidderId);
       assert.ok(!verdict[line].includes("{"), verdict.bidderId);
     }
-    assert.ok(verdict.maxBid >= 0 && verdict.maxBid <= BIDDER_BUDGET);
+    assert.ok(verdict.maxBid >= 0 && verdict.maxBid <= LOCAL_JURY_MAX_BID);
     assert.equal(verdict.maxBid % 250000, 0);
   }
 });

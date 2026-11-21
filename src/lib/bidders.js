@@ -1,24 +1,19 @@
 export const PAINTING_COUNT = 3;
 
-/** Every bidder can spend the same amount: the price comes from the work, not the wallet. */
-export const BIDDER_BUDGET = 25000000;
-
 export const BIDDERS = [
   {
     id: "gordon",
     name: "Gordon Rage-say",
     occupation: "TV Chef & Restaurant Critic",
-    budget: BIDDER_BUDGET,
     accent: "#d64b3f",
     voice: "voice-gordon",
     persona:
-      "You are Gordon Rage-say, a furious celebrity chef and restaurant critic. You despise anything that is not about food. If the painting even vaguely resembles food, a plate, fruit, a fish, a cake, a kitchen, a table setting or a bottle of wine, you become ecstatic and wildly generous. If it does not, you are insulted and cruel. You speak in short, loud, kitchen-abusive bursts ('RAW!', 'WHERE IS THE SAUCE?', 'DISGUSTING!').",
+      "You are Gordon Rage-say, a furious celebrity chef and restaurant critic. You despise anything that is not about food. If the painting even vaguely resembles food, a plate, fruit, a fish, a cake, a kitchen, a table setting or a bottle of wine, you become ecstatic and wildly generous. If it does not, you are insulted and cruel. You speak in loud, kitchen-abusive bursts ('RAW!', 'WHERE IS THE SAUCE?', 'DISGUSTING!').",
   },
   {
     id: "julian",
     name: "Julian Pretentiousberg",
     occupation: "Contemporary Art Curator",
-    budget: BIDDER_BUDGET,
     accent: "#8f6bd6",
     voice: "voice-julian",
     persona:
@@ -28,7 +23,6 @@ export const BIDDERS = [
     id: "leopold",
     name: "Prince Leopold Rembrandt-Stuffington",
     occupation: "Aristocrat & Old Master Collector",
-    budget: BIDDER_BUDGET,
     accent: "#c9a227",
     voice: "voice-leopold",
     persona:
@@ -38,7 +32,6 @@ export const BIDDERS = [
     id: "marguerite",
     name: "Marguerite Von Quirk",
     occupation: "Performance Artist & Eccentric Patron",
-    budget: BIDDER_BUDGET,
     accent: "#3fa89b",
     voice: "voice-marguerite",
     persona:
@@ -48,7 +41,6 @@ export const BIDDERS = [
     id: "ines",
     name: "Ines Barlow",
     occupation: "Landscape Preservationist & Traditional Collector",
-    budget: BIDDER_BUDGET,
     accent: "#5b8fc9",
     voice: "voice-ines",
     persona:
@@ -58,7 +50,6 @@ export const BIDDERS = [
     id: "chad",
     name: 'Chad "Doodle" McMahon',
     occupation: "Internet Tastemaker & Meme Archivist",
-    budget: BIDDER_BUDGET,
     accent: "#e07a3f",
     voice: "voice-chad",
     persona:

@@ -1,14 +1,15 @@
 import { BIDDERS } from "./bidders.js";
+import { LOCAL_JURY_MAX_BID } from "./local-jury.js";
 import { coveragePhrase } from "./paint-analysis.js";
 
 const clamp01 = (v) => Math.min(1, Math.max(0, v));
 const round250 = (v) => Math.round(v / 250000) * 250000;
 const pick = (list) => list[Math.floor(Math.random() * list.length)];
 
-function priceFor(score, budget) {
+function priceFor(score, ceiling) {
   if (score < 0.2) return 0;
   const curve = 0.08 + Math.pow(score, 1.5) * 0.92;
-  return Math.max(500000, round250(budget * curve));
+  return Math.max(500000, round250(ceiling * curve));
 }
 
 const TASTE = {
@@ -184,7 +185,7 @@ export function judgePaintingLocally(stats, paintingIndex) {
     return {
       bidderId: bidder.id,
       reaction: line,
-      maxBid: priceFor(score, bidder.budget),
+      maxBid: priceFor(score, LOCAL_JURY_MAX_BID),
       winLine: pick(WIN_LINES[bidder.id]),
       lossLine: pick(LOSS_LINES[bidder.id]),
     };

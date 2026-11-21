@@ -1,6 +1,7 @@
-import { BIDDER_BUDGET, BIDDERS, PAINTING_COUNT } from "./bidders.js";
+import { BIDDERS, PAINTING_COUNT } from "./bidders.js";
 import { fallbackVerdict } from "./auction.js";
 import { formatMoney } from "./format.js";
+import { formatLotHistory } from "./lot-history.js";
 import { askGeminiJson } from "./gemini.js";
 
 const verdictSchema = {
@@ -13,11 +14,11 @@ const verdictSchema = {
         properties: {
           bidder_id: { type: "string", enum: BIDDERS.map((bidder) => bidder.id) },
           reaction: { type: "string" },
-          max_bid_millions: { type: "number" },
+          max_bid_dollars: { type: "number" },
           win_line: { type: "string" },
           loss_line: { type: "string" },
         },
-        required: ["bidder_id", "reaction", "max_bid_millions", "win_line", "loss_line"],
+        required: ["bidder_id", "reaction", "max_bid_dollars", "win_line", "loss_line"],
       },
     },
   },
@@ -45,32 +46,35 @@ function clean(value, fallback, max = 260) {
   return text.length > max ? text.slice(0, max).trim() : text;
 }
 
-function clampBid(millions, budget) {
-  const value = Number(millions);
+function parseBid(dollars) {
+  const value = Number(dollars);
   if (!Number.isFinite(value) || value <= 0) return 0;
-  const dollars = Math.round((value * 1000000) / 250000) * 250000;
-  return Math.min(budget, Math.max(500000, dollars));
+  return Math.round(value);
 }
 
-function saleroomPrompt(paintingIndex) {
+function saleroomPrompt(paintingIndex, title, history) {
   const roster = BIDDERS.map(
     (bidder) => `${bidder.id} — ${bidder.name}, ${bidder.occupation}.\n${bidder.persona}`,
   ).join("\n\n");
+  const workTitle = String(title || "")
+    .trim()
+    .replace(/"/g, "'") || "Untitled";
 
-  return `You are the six bidders at a live art auction, all looking at the same lot: a painting by an unknown artist, shown in the attached image. This is painting number ${paintingIndex + 1} of ${PAINTING_COUNT} in the artist's life.
+  return `You are the six bidders at a live art auction, all looking at the same lot: a painting by an unknown artist, shown in the attached image. The artist has titled it "${workTitle}". This is painting number ${paintingIndex + 1} of ${PAINTING_COUNT} in the artist's life.
 
 THE SIX BIDDERS:
 
 ${roster}
 
-Every bidder in this room has the same ceiling: ${BIDDER_BUDGET / 1000000} million dollars. Nobody has a smaller wallet than anyone else, so what a work is worth to each of them comes only from the work itself.
+Each bidder chooses their own price from what the work is worth to them. There is no upper limit, and nobody is held back by a smaller wallet.
+${formatLotHistory(history)}
 
 Look at the painting once, then answer for ALL SIX bidders in a single response. Reply with JSON containing exactly one "verdicts" array with six entries, one per bidder, in this order: ${BIDDERS.map((bidder) => bidder.id).join(", ")}.
 
 Each entry needs:
 - "bidder_id": that bidder's id from the list above.
-- "reaction": their immediate out-loud reaction on first seeing it, 1-2 sentences, max 20 words. Be specific about what that bidder actually notices in the image (subject, shapes, colours, composition).
-- "max_bid_millions": the highest price that bidder would pay, in MILLIONS of dollars as a decimal number between 0 and ${BIDDER_BUDGET / 1000000}. For example 7.5 means seven and a half million dollars. 0 means they will not bid at all. Decide this freely from how good the work actually is by that bidder's own taste and standards: a painting that delights them can go very high, one that disappoints them goes to 0. No bidder is held back by a smaller budget than another. Make the six bids clearly different from one another.
+- "reaction": their immediate out-loud reaction on first seeing it, 1-2 sentences, max 20 words. Be specific about what that bidder actually notices in the image (subject, shapes, colours, composition), and react to the title "${workTitle}" where it suits their character.
+- "max_bid_dollars": the highest price that bidder would pay, as a whole number of US dollars with no upper limit. For example 7500000 means seven and a half million dollars, and 250 means two hundred and fifty dollars. 0 means they will not bid at all. Decide this freely from how good the work actually is by that bidder's own taste and standards: a painting that delights them can go as high as they like, one that disappoints them goes to 0. Make the six amounts clearly different from one another.
 - "win_line": one sentence they say if they win it, max 16 words.
 - "loss_line": one sentence they say if someone outbids them, max 16 words.
 
@@ -78,10 +82,10 @@ The six reactions must all be different and must sound like six different people
 }
 
 /** One request for the whole room: six bidders look at one painting. */
-export async function judgePaintingWithKey({ key, image, paintingIndex }) {
+export async function judgePaintingWithKey({ key, image, paintingIndex, title, history }) {
   const parsed = await askGeminiJson({
     key,
-    prompt: saleroomPrompt(paintingIndex),
+    prompt: saleroomPrompt(paintingIndex, title, history),
     images: [image],
     schema: verdictSchema,
   });
@@ -99,7 +103,7 @@ export async function judgePaintingWithKey({ key, image, paintingIndex }) {
     return {
       bidderId: bidder.id,
       reaction: clean(verdict.reaction, "…studies the work without saying a single word."),
-      maxBid: clampBid(verdict.max_bid_millions, bidder.budget),
+      maxBid: parseBid(verdict.max_bid_dollars),
       winLine: clean(verdict.win_line, "I had to have it.", 200),
       lossLine: clean(verdict.loss_line, "Ridiculous price.", 200),
     };

@@ -6,10 +6,11 @@ import AuctionResult from "@/components/game/AuctionResult";
 import CastIntro from "@/components/game/CastIntro";
 import { BIDDERS, PAINTING_COUNT } from "@/lib/bidders";
 import { buildAuction } from "@/lib/auction";
+import { buildLotRecord } from "@/lib/lot-history";
 import { judgePaintingLocally } from "@/lib/judging";
 import { judgePaintingWithKey } from "@/lib/saleroom-ai";
 
-function Examining({ paintingIndex }) {
+function Examining({ paintingIndex, title }) {
   return (
     <div className="mx-auto max-w-4xl px-4 pb-16 pt-[60vh]">
       <div className="rounded-sm bg-black/60 px-6 py-6 text-center">
@@ -19,6 +20,7 @@ function Examining({ paintingIndex }) {
         <h2 className="mt-4 font-heading text-2xl sm:text-3xl">
           The bidders are examining the work
         </h2>
+        {title && <p className="mt-2 font-heading text-lg text-foreground/80">{title}</p>}
       </div>
       <div className="mt-6 grid grid-cols-3 gap-3 sm:grid-cols-6">
         {BIDDERS.map((bidder) => (
@@ -46,7 +48,9 @@ function Examining({ paintingIndex }) {
 
 export default function AuctionStage({
   paintingUrl,
+  paintingTitle = null,
   paintingIndex,
+  lotHistory = [],
   stats,
   onContinue,
   geminiKey = null,
@@ -91,7 +95,13 @@ export default function AuctionStage({
       if (geminiKey) {
         try {
           const image = await paintingForAi(paintingUrl);
-          const list = await judgePaintingWithKey({ key: geminiKey, image, paintingIndex });
+          const list = await judgePaintingWithKey({
+            key: geminiKey,
+            image,
+            paintingIndex,
+            title: paintingTitle,
+            history: lotHistory,
+          });
           if (list?.length !== BIDDERS.length) {
             throw new Error("Gemini returned no verdicts");
           }
@@ -109,7 +119,17 @@ export default function AuctionStage({
       alive = false;
       clearTimeout(timer);
     };
-  }, [stats, paintingIndex, geminiKey, demoVerdicts, paintingUrl, attempt, settle]);
+  }, [
+    stats,
+    paintingIndex,
+    paintingTitle,
+    lotHistory,
+    geminiKey,
+    demoVerdicts,
+    paintingUrl,
+    attempt,
+    settle,
+  ]);
 
   useEffect(() => {
     if (status !== "reactions" || !verdicts.length) return;
@@ -144,7 +164,7 @@ export default function AuctionStage({
         </div>
       );
     }
-    return <Examining paintingIndex={paintingIndex} />;
+    return <Examining paintingIndex={paintingIndex} title={paintingTitle} />;
   }
 
   if (status === "cast") {
@@ -155,6 +175,7 @@ export default function AuctionStage({
     return (
       <AuctionRoom
         paintingIndex={paintingIndex}
+        title={paintingTitle}
         verdicts={verdicts}
         revealed={verdicts.length}
         leaderId={null}
@@ -181,7 +202,12 @@ export default function AuctionStage({
         auction={auction}
         paintingIndex={paintingIndex}
         isLast={paintingIndex === PAINTING_COUNT - 1}
-        onContinue={() => onContinue(auction.price)}
+        onContinue={() =>
+          onContinue({
+            price: auction.price,
+            record: buildLotRecord({ title: paintingTitle, verdicts, auction }),
+          })
+        }
       />
     );
   }
@@ -191,6 +217,7 @@ export default function AuctionStage({
   return (
     <AuctionRoom
       paintingIndex={paintingIndex}
+      title={paintingTitle}
       verdicts={verdicts}
       revealed={revealed}
       leaderId={current?.bidderId ?? null}

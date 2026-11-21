@@ -1,7 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { buildAuction, fallbackVerdict, STARTING_BID } from "../src/lib/auction.js";
-import { BIDDER_BUDGET, BIDDERS } from "../src/lib/bidders.js";
+import { BIDDERS } from "../src/lib/bidders.js";
+import { LOCAL_JURY_MAX_BID } from "../src/lib/local-jury.js";
 
 const verdict = (bidderId, maxBid) => ({
   bidderId,
@@ -11,13 +12,13 @@ const verdict = (bidderId, maxBid) => ({
   lossLine: "theirs",
 });
 
-test("fallbackVerdict stays inside the shared budget", (t) => {
+test("fallbackVerdict stays inside the local jury ceiling", (t) => {
   t.mock.method(Math, "random", () => 0.5);
   const result = fallbackVerdict(BIDDERS[0]);
 
   assert.equal(result.bidderId, BIDDERS[0].id);
-  assert.ok(result.maxBid >= BIDDER_BUDGET * 0.12);
-  assert.ok(result.maxBid <= BIDDER_BUDGET * 0.67);
+  assert.ok(result.maxBid >= LOCAL_JURY_MAX_BID * 0.12);
+  assert.ok(result.maxBid <= LOCAL_JURY_MAX_BID * 0.67);
   assert.equal(result.maxBid % 250000, 0);
   assert.equal(typeof result.reaction, "string");
 });
