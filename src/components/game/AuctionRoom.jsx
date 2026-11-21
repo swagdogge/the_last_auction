@@ -1,0 +1,57 @@
+import BidderCard from "@/components/game/BidderCard";
+import { BIDDERS } from "@/lib/bidders";
+import { formatCompact, formatMoney } from "@/lib/format";
+
+export default function AuctionRoom({
+  paintingIndex,
+  verdicts,
+  revealed,
+  leaderId,
+  price,
+  priceLabel,
+  caption,
+  action,
+}) {
+  const byId = Object.fromEntries(verdicts.map((v) => [v.bidderId, v]));
+
+  return (
+    <div className="mx-auto max-w-5xl px-4 pb-16 pt-[60vh]">
+      <div className="rounded-sm bg-black/60 px-5 py-4 sm:flex sm:items-end sm:justify-between sm:gap-6">
+        <div>
+          <p className="text-[10px] uppercase tracking-[0.3em] text-foreground/60">
+            Lot {paintingIndex + 1} · on the easel
+          </p>
+          {caption && (
+            <p className="mt-2 text-[11px] leading-relaxed text-foreground/70">{caption}</p>
+          )}
+        </div>
+        <div className="mt-3 sm:mt-0 sm:text-right">
+          <p className="text-[9px] uppercase tracking-[0.35em] text-muted-foreground">
+            {priceLabel || (price > 0 ? "Current bid" : "Opening bid")}
+          </p>
+          <p className="money mt-1 font-mono text-2xl">
+            {price > 0 ? formatMoney(price) : "—"}
+          </p>
+        </div>
+      </div>
+
+      {action && <div className="mt-4">{action}</div>}
+
+      <div className="mt-6 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6">
+        {BIDDERS.map((bidder, index) => {
+          const verdict = byId[bidder.id];
+          const isLeader = leaderId === bidder.id;
+          return (
+            <BidderCard
+              key={bidder.id}
+              bidder={bidder}
+              state={isLeader ? "lead" : "idle"}
+              bid={isLeader ? formatCompact(price) : undefined}
+              line={index < revealed ? verdict?.reaction : undefined}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+}

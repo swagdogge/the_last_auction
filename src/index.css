@@ -1,0 +1,158 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 340 32% 5%;
+    --foreground: 42 36% 92%;
+    --card: 340 26% 8%;
+    --card-foreground: 42 36% 92%;
+    --popover: 340 26% 8%;
+    --popover-foreground: 42 36% 92%;
+    --primary: 0 0% 93%;
+    --primary-foreground: 340 40% 6%;
+    --secondary: 340 18% 14%;
+    --secondary-foreground: 42 30% 90%;
+    --muted: 340 16% 13%;
+    --muted-foreground: 40 12% 58%;
+    --accent: 340 22% 16%;
+    --accent-foreground: 42 30% 92%;
+    --destructive: 0 62% 48%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 340 16% 18%;
+    --input: 340 16% 18%;
+    --ring: 0 0% 93%;
+    --chart-1: 0 0% 85%;
+    --chart-2: 350 60% 48%;
+    --chart-3: 280 30% 60%;
+    --chart-4: 160 30% 45%;
+    --chart-5: 20 70% 55%;
+    --radius: 0.35rem;
+    --font-heading: "Pixelify Sans", ui-rounded, system-ui, sans-serif;
+    --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+    --font-display: "Pixelify Sans", ui-rounded, system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+    --sidebar-background: 340 26% 8%;
+    --sidebar-foreground: 42 30% 90%;
+    --sidebar-primary: 0 0% 93%;
+    --sidebar-primary-foreground: 340 40% 6%;
+    --sidebar-accent: 340 22% 16%;
+    --sidebar-accent-foreground: 42 30% 92%;
+    --sidebar-border: 340 16% 18%;
+    --sidebar-ring: 0 0% 93%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+  }
+
+  ::selection {
+    background: hsl(var(--primary) / 0.3);
+  }
+}
+
+@layer utilities {
+  .velvet {
+    background-color: hsl(340 30% 5%);
+  }
+
+  .gold-text {
+    color: hsl(var(--foreground));
+  }
+
+  .money {
+    color: hsl(145 65% 55%);
+  }
+
+  .btn-game {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid hsl(0 0% 100%);
+    border-radius: 0.2rem;
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    font-family: var(--font-heading);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    box-shadow: 0 5px 0 0 hsl(0 0% 30%);
+    transition:
+      transform 90ms ease,
+      box-shadow 90ms ease,
+      filter 90ms ease;
+  }
+
+  .btn-game:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 0 0 hsl(0 0% 30%);
+  }
+
+  .btn-game:active {
+    transform: translateY(4px);
+    box-shadow: 0 1px 0 0 hsl(0 0% 30%);
+  }
+
+  .btn-game-ghost {
+    background-color: hsl(var(--secondary));
+    color: hsl(var(--foreground));
+    box-shadow: 0 5px 0 0 hsl(0 0% 12%);
+  }
+
+  .btn-game-ghost:hover {
+    box-shadow: 0 6px 0 0 hsl(0 0% 12%);
+  }
+
+  .btn-game-ghost:active {
+    box-shadow: 0 1px 0 0 hsl(0 0% 12%);
+  }
+
+  .gold-rule {
+    background-color: hsl(0 0% 100% / 0.3);
+  }
+
+  .paper-shadow {
+    box-shadow:
+      0 0 0 1px hsl(0 0% 100% / 0.22),
+      8px 8px 0 0 rgba(0, 0, 0, 0.55);
+  }
+
+  .lower-third {
+    background-image: linear-gradient(180deg, hsl(340 30% 6% / 0.2) 0%, hsl(340 34% 4% / 0.95) 62%);
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    scrollbar-width: none;
+  }
+
+  /* One speaking voice per bidder, all set large enough to read. */
+  .voice-gordon {
+    font-family: "Archivo Black", ui-sans-serif, system-ui, sans-serif;
+  }
+  .voice-julian {
+    font-family: "Playfair Display", ui-serif, Georgia, serif;
+    font-style: italic;
+  }
+  .voice-leopold {
+    font-family: "Cormorant Garamond", ui-serif, Georgia, serif;
+  }
+  .voice-marguerite {
+    font-family: "Marcellus", ui-serif, Georgia, serif;
+  }
+  .voice-ines {
+    font-family: "Lora", ui-serif, Georgia, serif;
+  }
+  .voice-chad {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+  }
+}

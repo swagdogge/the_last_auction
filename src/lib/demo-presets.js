@@ -1,0 +1,322 @@
+// Demo mode: six finished works from the estate, each with the saleroom's
+// reactions already recorded. Nothing here calls a model at runtime.
+
+const painting = (inner) =>
+  `data:image/svg+xml;utf8,${encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 960" width="720" height="960"><rect width="720" height="960" fill="#f3ede0"/>${inner}</svg>`,
+  )}`;
+
+export const DEMO_PRESETS = [
+  {
+    id: "red-field",
+    title: "Untitled (Red Field)",
+    medium: "oil on board",
+    url: painting(
+      '<rect x="60" y="70" width="600" height="700" fill="#b8332e"/><rect x="60" y="70" width="600" height="700" fill="none" stroke="#8f2320" stroke-width="12"/><path d="M96 806 L636 792" stroke="#2a1a16" stroke-width="16" stroke-linecap="round"/>',
+    ),
+    verdicts: [
+      {
+        bidderId: "gordon",
+        reaction: "A red reduction. I would put a fish on it and charge thirty pounds.",
+        maxBid: 6000000,
+        winLine: "The red is a sauce. Mine.",
+        lossLine: "Somebody paid for a plate I would not serve.",
+      },
+      {
+        bidderId: "julian",
+        reaction: "Pure chromatic insistence. The red is an argument, not a colour.",
+        maxBid: 14000000,
+        winLine: "I have purchased the argument.",
+        lossLine: "Let them have the surface. I keep the discourse.",
+      },
+      {
+        bidderId: "leopold",
+        reaction: "One flat field of red. My ancestors would have framed the frame.",
+        maxBid: 4500000,
+        winLine: "It will hang in the corridor nobody visits.",
+        lossLine: "A trifle. Let it go.",
+      },
+      {
+        bidderId: "marguerite",
+        reaction: "The red is bleeding into the room. I feel faint. Keep it coming.",
+        maxBid: 19000000,
+        winLine: "It came home with me and it will not sleep.",
+        lossLine: "The red went to a safer house. Tragic.",
+      },
+      {
+        bidderId: "ines",
+        reaction: "No horizon, no weather. I keep looking for land and finding paint.",
+        maxBid: 2250000,
+        winLine: "I will learn to read the field.",
+        lossLine: "I hope they can find somewhere in it.",
+      },
+      {
+        bidderId: "chad",
+        reaction: "this is one colour and it still goes hard. thumbnail of the year.",
+        maxBid: 7500000,
+        winLine: "bought the red. no cap.",
+        lossLine: "the red went for more than my rent.",
+      },
+    ],
+  },
+  {
+    id: "the-catch",
+    title: "The Catch",
+    medium: "acrylic on canvas",
+    url: painting(
+      '<ellipse cx="360" cy="640" rx="250" ry="76" fill="#dcd3c2" stroke="#b0a58f" stroke-width="10"/><path d="M196 566 q120 -176 306 -122 q-44 92 -146 132 q124 22 154 62 q-166 92 -314 -72z" fill="#6f93a6" stroke="#2d3f49" stroke-width="10"/><circle cx="300" cy="470" r="10" fill="#1a1410"/><path d="M470 430 q40 -30 78 -6" stroke="#2d3f49" stroke-width="9" fill="none"/>',
+    ),
+    verdicts: [
+      {
+        bidderId: "gordon",
+        reaction: "THAT is a fish. That is a plate. Somebody in this room can cook.",
+        maxBid: 18000000,
+        winLine: "MINE. And I am serving it tonight.",
+        lossLine: "A robbery. A fish robbery.",
+      },
+      {
+        bidderId: "julian",
+        reaction: "Legible. Illustrative. The fish is doing all of the thinking.",
+        maxBid: 3000000,
+        winLine: "I will call it a readymade.",
+        lossLine: "The fish was always for the market.",
+      },
+      {
+        bidderId: "leopold",
+        reaction: "A modest still life. The fish has more patience than the painter.",
+        maxBid: 9000000,
+        winLine: "It belongs beside the Dutch things.",
+        lossLine: "One does not duel over a fish.",
+      },
+      {
+        bidderId: "marguerite",
+        reaction: "The fish is dead and the plate is screaming. I feel seen.",
+        maxBid: 12000000,
+        winLine: "The fish chose me.",
+        lossLine: "The fish went to a kitchen. Of course it did.",
+      },
+      {
+        bidderId: "ines",
+        reaction: "There is no sky in it, only a plate. I am politely lost.",
+        maxBid: 1500000,
+        winLine: "I will hang it near a window.",
+        lossLine: "Let it go to someone hungry.",
+      },
+      {
+        bidderId: "chad",
+        reaction: "the fish is kind of a mood. would repost.",
+        maxBid: 5000000,
+        winLine: "fish acquired. posting later.",
+        lossLine: "lost the fish. it's so over.",
+      },
+    ],
+  },
+  {
+    id: "two-suns",
+    title: "Two Suns Over Nowhere",
+    medium: "oil on linen",
+    url: painting(
+      '<rect x="0" y="600" width="720" height="360" fill="#dfd2b2"/><rect x="0" y="556" width="720" height="66" fill="#8fa5b8"/><path d="M0 556 L720 556" stroke="#5d6f7d" stroke-width="8"/><circle cx="246" cy="330" r="112" fill="#e8a13c"/><circle cx="472" cy="246" r="74" fill="#c9582f"/><path d="M120 690 q120 -40 240 0" stroke="#b9a882" stroke-width="10" fill="none"/>',
+    ),
+    verdicts: [
+      {
+        bidderId: "gordon",
+        reaction: "Two suns and no food. What am I supposed to do with weather?",
+        maxBid: 2000000,
+        winLine: "Fine. I will hang it by the pass.",
+        lossLine: "No loss. There was nothing to eat.",
+      },
+      {
+        bidderId: "julian",
+        reaction: "The second sun refuses to justify itself. Finally, a position.",
+        maxBid: 16000000,
+        winLine: "I own the impossibility now.",
+        lossLine: "Let the second sun go. I keep the theory.",
+      },
+      {
+        bidderId: "leopold",
+        reaction: "A landscape of some ambition. The horizon is nearly straight.",
+        maxBid: 11000000,
+        winLine: "It will face the east window.",
+        lossLine: "A trifle, and yet. Hm.",
+      },
+      {
+        bidderId: "marguerite",
+        reaction: "Two suns is one sun too honest. I want to stand in the glare.",
+        maxBid: 17500000,
+        winLine: "I will perform in front of it nightly.",
+        lossLine: "The glare went elsewhere. I am unwell.",
+      },
+      {
+        bidderId: "ines",
+        reaction: "There is a horizon, there is weather, there is a place. I can breathe.",
+        maxBid: 22000000,
+        winLine: "It remembers somewhere, and now it is mine.",
+        lossLine: "I hope whoever got it can see the place in it.",
+      },
+      {
+        bidderId: "chad",
+        reaction: "double sun is main character energy. huge.",
+        maxBid: 8000000,
+        winLine: "two suns in my flat. insane.",
+        lossLine: "second sun went to someone else. mid.",
+      },
+    ],
+  },
+  {
+    id: "scream-study",
+    title: "Scream Study",
+    medium: "charcoal and paint",
+    url: painting(
+      '<rect x="40" y="40" width="640" height="880" fill="#d8b64a"/><path d="M120 770 q92 -262 42 -424 q162 122 262 42 q-62 242 42 382" fill="none" stroke="#1c1712" stroke-width="28" stroke-linecap="round"/><circle cx="332" cy="300" r="48" fill="#1c1712"/><path d="M232 560 q110 60 214 6" stroke="#1c1712" stroke-width="18" fill="none" stroke-linecap="round"/>',
+    ),
+    verdicts: [
+      {
+        bidderId: "gordon",
+        reaction: "Somebody screamed on a canvas. In my kitchen that is called a service.",
+        maxBid: 7000000,
+        winLine: "I will hang it where the shouting happens.",
+        lossLine: "Let them shout about it elsewhere.",
+      },
+      {
+        bidderId: "julian",
+        reaction: "Gesture without irony. Almost embarrassing. Almost.",
+        maxBid: 10000000,
+        winLine: "I bought the embarrassment.",
+        lossLine: "The gesture went cheap. Fitting.",
+      },
+      {
+        bidderId: "leopold",
+        reaction: "Wild marks. My restorer would refuse the job.",
+        maxBid: 2500000,
+        winLine: "It will hang in the cellar, with dignity.",
+        lossLine: "One does not chase hysteria.",
+      },
+      {
+        bidderId: "marguerite",
+        reaction: "SHE IS STILL SCREAMING. I can hear her from here.",
+        maxBid: 21000000,
+        winLine: "The scream lives with me now.",
+        lossLine: "The scream was sold to a quieter house.",
+      },
+      {
+        bidderId: "ines",
+        reaction: "No land, no weather, only noise. I am so sorry.",
+        maxBid: 750000,
+        winLine: "I will give it a window.",
+        lossLine: "Forgive me. I need a sky.",
+      },
+      {
+        bidderId: "chad",
+        reaction: "this is a reaction image already. no notes.",
+        maxBid: 9500000,
+        winLine: "the scream is mine. posting.",
+        lossLine: "scream went to a normie. devastating.",
+      },
+    ],
+  },
+  {
+    id: "portrait-of-nobody",
+    title: "Portrait of Nobody",
+    medium: "oil on panel",
+    url: painting(
+      '<rect x="0" y="640" width="720" height="320" fill="#7f9a6f"/><path d="M302 196 q124 -62 186 42 q62 112 -10 214 q-42 132 -154 112 q-144 -22 -122 -174 q22 -132 100 -194z" fill="#cfc3ae" stroke="#2b241c" stroke-width="12"/><circle cx="332" cy="352" r="18" fill="#2b241c"/><path d="M292 462 q42 22 84 0" stroke="#2b241c" stroke-width="12" fill="none" stroke-linecap="round"/><path d="M150 720 L570 720" stroke="#5d7350" stroke-width="10"/>',
+    ),
+    verdicts: [
+      {
+        bidderId: "gordon",
+        reaction: "A face with no appetite. I cannot read a menu in it.",
+        maxBid: 3500000,
+        winLine: "I will put it in the staff room.",
+        lossLine: "Nobody lost nothing.",
+      },
+      {
+        bidderId: "julian",
+        reaction: "The absent sitter is the whole point. Devastating, if intentional.",
+        maxBid: 15000000,
+        winLine: "I have acquired the absence.",
+        lossLine: "Absence is cheap today, apparently.",
+      },
+      {
+        bidderId: "leopold",
+        reaction: "A portrait with one eye and no lineage. Curious.",
+        maxBid: 8000000,
+        winLine: "It joins the family, unnamed.",
+        lossLine: "The family has enough faces.",
+      },
+      {
+        bidderId: "marguerite",
+        reaction: "Nobody is looking at me and I cannot stop looking back.",
+        maxBid: 13000000,
+        winLine: "Nobody came home with me.",
+        lossLine: "Nobody went to someone else. Typical.",
+      },
+      {
+        bidderId: "ines",
+        reaction: "A person with no place behind them. That I understand.",
+        maxBid: 6500000,
+        winLine: "I will give them a landscape.",
+        lossLine: "I hope they are somewhere now.",
+      },
+      {
+        bidderId: "chad",
+        reaction: "the blank stare is so relatable. this is me on a monday.",
+        maxBid: 11000000,
+        winLine: "nobody is mine now.",
+        lossLine: "nobody got outbid. ironic.",
+      },
+    ],
+  },
+  {
+    id: "nine-parts",
+    title: "Composition in Nine Parts",
+    medium: "enamel on canvas",
+    url: painting(
+      '<rect x="70" y="110" width="580" height="740" fill="#fbf8f0" stroke="#1b1712" stroke-width="14"/><path d="M263 110 L263 850 M457 110 L457 850 M70 357 L650 357 M70 603 L650 603" stroke="#1b1712" stroke-width="14"/><rect x="70" y="110" width="193" height="247" fill="#1b1712"/><rect x="457" y="357" width="193" height="246" fill="#b8332e"/>',
+    ),
+    verdicts: [
+      {
+        bidderId: "gordon",
+        reaction: "Nine boxes. A bento with nothing in it.",
+        maxBid: 4000000,
+        winLine: "I will fill it with something.",
+        lossLine: "The boxes went to a hungrier bidder.",
+      },
+      {
+        bidderId: "julian",
+        reaction: "Nine parts, zero feeling. Formally impeccable, spiritually airless.",
+        maxBid: 13500000,
+        winLine: "Airless is the correct temperature.",
+        lossLine: "Let them own the grid. I own the reading.",
+      },
+      {
+        bidderId: "leopold",
+        reaction: "A grid. Discipline, at last, in this room.",
+        maxBid: 12000000,
+        winLine: "Order returns to the collection.",
+        lossLine: "The order went elsewhere. Chaos wins.",
+      },
+      {
+        bidderId: "marguerite",
+        reaction: "Everything in its box. Nothing in its body. Pass.",
+        maxBid: 0,
+        winLine: "I will not be explaining this.",
+        lossLine: "Good. Let the boxes go.",
+      },
+      {
+        bidderId: "ines",
+        reaction: "There is no weather in a grid, and no one standing in it.",
+        maxBid: 1250000,
+        winLine: "I will hang it where the light moves.",
+        lossLine: "Someone else will keep the boxes.",
+      },
+      {
+        bidderId: "chad",
+        reaction: "grid is giving spreadsheet. not in a good way.",
+        maxBid: 2000000,
+        winLine: "ironic purchase. posting anyway.",
+        lossLine: "the grid went for nothing. deserved.",
+      },
+    ],
+  },
+];
