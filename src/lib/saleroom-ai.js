@@ -82,12 +82,13 @@ The six reactions must all be different and must sound like six different people
 }
 
 /** One request for the whole room: six bidders look at one painting. */
-export async function judgePaintingWithKey({ key, image, paintingIndex, title, history }) {
+export async function judgePaintingWithKey({ key, image, paintingIndex, title, history, onRaw }) {
   const parsed = await askGeminiJson({
     key,
     prompt: saleroomPrompt(paintingIndex, title, history),
     images: [image],
     schema: verdictSchema,
+    onRaw,
   });
 
   const list = Array.isArray(parsed?.verdicts) ? parsed.verdicts : [];

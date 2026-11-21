@@ -30,14 +30,18 @@ test("AI verdicts are mapped onto the roster and bids read as dollars", async (t
     }),
   );
 
+  const onRaw = t.mock.fn();
   const verdicts = await judgePaintingWithKey({
     key: "test",
     image: IMAGE,
     paintingIndex: 0,
     title: "Supper for ghosts",
+    onRaw,
   });
 
   assert.equal(fetchMock.mock.calls.length, 1);
+  assert.equal(onRaw.mock.calls.length, 1);
+  assert.match(onRaw.mock.calls[0].arguments[0], /"verdicts"/);
   assert.deepEqual(
     verdicts.map((verdict) => verdict.bidderId),
     BIDDERS.map((bidder) => bidder.id),

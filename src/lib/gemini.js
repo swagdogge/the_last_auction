@@ -27,7 +27,7 @@ function imagePart(dataUrl) {
 }
 
 /** One call: a prompt, optional images, and a JSON answer back. */
-export async function askGeminiJson({ key, prompt, images = [], schema }) {
+export async function askGeminiJson({ key, prompt, images = [], schema, onRaw }) {
   if (!key) throw new Error("No Gemini key");
 
   const parts = [{ text: prompt }];
@@ -73,6 +73,7 @@ export async function askGeminiJson({ key, prompt, images = [], schema }) {
       .trim();
 
     if (!text) throw new Error("Gemini returned nothing");
+    onRaw?.(text);
     return JSON.parse(text);
   } catch (error) {
     if (error?.name === "AbortError") throw new Error("Gemini timed out");

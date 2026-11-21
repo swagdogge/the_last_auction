@@ -62,6 +62,7 @@ export default function AuctionStage({
   const [revealed, setRevealed] = useState(0);
   const [step, setStep] = useState(-1);
   const [aiError, setAiError] = useState(null);
+  const [aiRaw, setAiRaw] = useState(null);
   const [attempt, setAttempt] = useState(0);
 
   const settle = useCallback(
@@ -82,6 +83,7 @@ export default function AuctionStage({
   useEffect(() => {
     let alive = true;
     setAiError(null);
+    setAiRaw(null);
 
     const finish = (list) => {
       if (alive) settle(list);
@@ -101,6 +103,9 @@ export default function AuctionStage({
             paintingIndex,
             title: paintingTitle,
             history: lotHistory,
+            onRaw: (text) => {
+              if (alive) setAiRaw(text);
+            },
           });
           if (list?.length !== BIDDERS.length) {
             throw new Error("Gemini returned no verdicts");
@@ -158,7 +163,10 @@ export default function AuctionStage({
           <AiErrorChoice
             error={aiError}
             onRetry={retry}
-            onFallback={() => settle(judgePaintingLocally(stats, paintingIndex))}
+            onFallback={() => {
+              setAiRaw(null);
+              settle(judgePaintingLocally(stats, paintingIndex));
+            }}
             onKeySaved={retry}
           />
         </div>
@@ -178,6 +186,7 @@ export default function AuctionStage({
         title={paintingTitle}
         verdicts={verdicts}
         revealed={verdicts.length}
+        debugRaw={aiRaw}
         leaderId={null}
         price={auction.price}
         priceLabel="Hammer price"
@@ -220,6 +229,7 @@ export default function AuctionStage({
       title={paintingTitle}
       verdicts={verdicts}
       revealed={revealed}
+      debugRaw={aiRaw}
       leaderId={current?.bidderId ?? null}
       price={current?.amount ?? 0}
       caption={status === "bidding" ? "The bidding is open." : "First impressions."}

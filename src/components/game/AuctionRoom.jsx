@@ -1,12 +1,22 @@
+import { useState } from "react";
 import BidderCard from "@/components/game/BidderCard";
 import { BIDDERS } from "@/lib/bidders";
 import { formatCompact, formatMoney } from "@/lib/format";
+
+function prettyJson(raw) {
+  try {
+    return JSON.stringify(JSON.parse(raw), null, 2);
+  } catch {
+    return raw;
+  }
+}
 
 export default function AuctionRoom({
   paintingIndex,
   title = null,
   verdicts,
   revealed,
+  debugRaw = null,
   leaderId,
   price,
   priceLabel,
@@ -14,6 +24,7 @@ export default function AuctionRoom({
   action,
 }) {
   const byId = Object.fromEntries(verdicts.map((v) => [v.bidderId, v]));
+  const [showDebug, setShowDebug] = useState(false);
 
   return (
     <div className="mx-auto max-w-5xl px-4 pb-16 pt-[60vh]">
@@ -54,6 +65,23 @@ export default function AuctionRoom({
           );
         })}
       </div>
+
+      {debugRaw && (
+        <div className="mt-8">
+          <button
+            type="button"
+            onClick={() => setShowDebug((value) => !value)}
+            className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground underline decoration-white/30 underline-offset-4 hover:text-foreground"
+          >
+            {showDebug ? "Hide debug info" : "Show debug info"}
+          </button>
+          {showDebug && (
+            <pre className="mt-3 max-h-96 overflow-auto whitespace-pre-wrap break-words rounded-sm bg-black/80 p-4 font-mono text-[10px] leading-relaxed text-foreground/80">
+              {prettyJson(debugRaw)}
+            </pre>
+          )}
+        </div>
+      )}
     </div>
   );
 }
