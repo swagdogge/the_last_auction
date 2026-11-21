@@ -1,4 +1,4 @@
-import { formatMoney } from "@/lib/format";
+import { formatMoney } from "./format.js";
 
 const TITLES = [
   "The Complete Works",

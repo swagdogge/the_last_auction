@@ -1,7 +1,7 @@
-import { BIDDER_BUDGET, BIDDERS, PAINTING_COUNT } from "@/lib/bidders";
-import { fallbackVerdict } from "@/lib/auction";
-import { formatMoney } from "@/lib/format";
-import { askGeminiJson } from "@/lib/gemini";
+import { BIDDER_BUDGET, BIDDERS, PAINTING_COUNT } from "./bidders.js";
+import { fallbackVerdict } from "./auction.js";
+import { formatMoney } from "./format.js";
+import { askGeminiJson } from "./gemini.js";
 
 const verdictSchema = {
   type: "object",
@@ -36,7 +36,11 @@ const obituarySchema = {
 
 function clean(value, fallback, max = 260) {
   if (typeof value !== "string") return fallback;
-  const text = value.replace(/\s+/g, " ").replace(/^["'“”]+|["'“”]+$/g, "").trim();
+  const text = value
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/^["'“”]+|["'“”]+$/g, "")
+    .trim();
   if (!text) return fallback;
   return text.length > max ? text.slice(0, max).trim() : text;
 }

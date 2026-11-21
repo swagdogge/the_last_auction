@@ -1,5 +1,5 @@
-import { BIDDERS } from "@/lib/bidders";
-import { coveragePhrase } from "@/lib/paint-analysis";
+import { BIDDERS } from "./bidders.js";
+import { coveragePhrase } from "./paint-analysis.js";
 
 const clamp01 = (v) => Math.min(1, Math.max(0, v));
 const round250 = (v) => Math.round(v / 250000) * 250000;

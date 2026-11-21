@@ -9,7 +9,9 @@
     "build:firebase": "vite build --config vite.config.firebase.js && node firebase/prepare.mjs",
     "lint": "eslint . --quiet",
     "lint:fix": "eslint . --fix",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "node --test test/*.test.mjs",
+    "test:watch": "node --watch --test test/*.test.mjs"
   },
   "dependencies": {
     "@base44/sdk": "^0.8.63",
