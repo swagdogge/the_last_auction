@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { buildAuction, fallbackVerdict, STARTING_BID } from "../src/lib/auction.js";
+import { buildAuction, fallbackVerdict } from "../src/lib/auction.js";
 import { BIDDERS } from "../src/lib/bidders.js";
 import { LOCAL_JURY_MAX_BID } from "../src/lib/local-jury.js";
 
@@ -25,7 +25,7 @@ test("fallbackVerdict stays inside the local jury ceiling", (t) => {
 
 test("the highest max bid wins and the second highest is runner-up", () => {
   const result = buildAuction([
-    verdict("low", STARTING_BID),
+    verdict("low", 1),
     verdict("high", 8000000),
     verdict("mid", 4000000),
   ]);
@@ -33,13 +33,22 @@ test("the highest max bid wins and the second highest is runner-up", () => {
   assert.equal(result.winnerId, "high");
   assert.equal(result.runnerUpId, "mid");
   assert.ok(result.sequence.length > 0);
-  assert.ok(result.price >= STARTING_BID);
+  assert.ok(result.price >= 1);
   assert.ok(result.price <= 8000000);
   assert.deepEqual(result.sequence.at(-1), { bidderId: "high", amount: result.price });
 });
 
-test("bids below the starting price produce an empty auction", () => {
-  assert.deepEqual(buildAuction([verdict("a", 100), verdict("b", 0)]), {
+test("a one dollar bid still sells the lot", () => {
+  assert.deepEqual(buildAuction([verdict("a", 1), verdict("b", 0)]), {
+    sequence: [{ bidderId: "a", amount: 1 }],
+    winnerId: "a",
+    runnerUpId: null,
+    price: 1,
+  });
+});
+
+test("zero bids produce no sale", () => {
+  assert.deepEqual(buildAuction([verdict("a", 0), verdict("b", 0)]), {
     sequence: [],
     winnerId: null,
     runnerUpId: null,

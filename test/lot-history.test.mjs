@@ -32,11 +32,13 @@ test("a lot record keeps the winner, the passed bidders and last lines", () => {
 test("the recap is short, named and carries the no-repetition rules", () => {
   const recap = formatLotHistory([lot()]);
 
-  assert.match(recap, /WHAT HAS HAPPENED SO FAR/);
-  assert.match(recap, /Lot 1 "Sunset 'blob'": winner Ines Barlow \(\$1\.2M\)/);
-  assert.match(recap, /Gordon Rage-say passed/);
-  assert.match(recap, /Gordon Rage-say's last line: "Reaction gordon"/);
-  assert.match(recap, /must NOT reuse phrases, jokes or the same kind of observation/);
-  assert.match(recap, /lost twice is hungrier, someone who just won is pickier/);
+  assert.match(recap, /HISTORY/);
+  assert.match(recap, /Lot 1 "Sunset 'blob'": Ines Barlow won \(\$1\.2M\), Julian Pretentiousberg lost to them\./);
+  assert.match(recap, /Gordon Rage-say: bored, nothing has moved them/);
+  assert.match(recap, /Ines Barlow: has won 1, pickier now/);
+  assert.match(recap, /Julian Pretentiousberg: lost 1, hungrier/);
+  assert.match(recap, /Gordon Rage-say: "Reaction gordon"/);
+  assert.match(recap, /LAST LINES \(never reuse their wording or jokes\):/);
+  assert.match(recap, /Keep each comic style but invent fresh jokes and observations\./);
   assert.equal(formatLotHistory([]), "");
 });

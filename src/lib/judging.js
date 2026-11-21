@@ -9,7 +9,7 @@ const pick = (list) => list[Math.floor(Math.random() * list.length)];
 function priceFor(score, ceiling) {
   if (score < 0.2) return 0;
   const curve = 0.08 + Math.pow(score, 1.5) * 0.92;
-  return Math.max(500000, round250(ceiling * curve));
+  return round250(ceiling * curve);
 }
 
 const TASTE = {

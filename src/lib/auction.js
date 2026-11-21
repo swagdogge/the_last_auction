@@ -1,7 +1,5 @@
 import { LOCAL_JURY_MAX_BID } from "./local-jury.js";
 
-export const STARTING_BID = 500000;
-
 export function fallbackVerdict(bidder) {
   const maxBid =
     Math.round((LOCAL_JURY_MAX_BID * (0.12 + Math.random() * 0.55)) / 250000) * 250000;
@@ -20,7 +18,7 @@ export function fallbackVerdict(bidder) {
  */
 export function buildAuction(verdicts) {
   const pool = verdicts
-    .filter((v) => v.maxBid >= STARTING_BID)
+    .filter((v) => v.maxBid > 0)
     .sort((a, b) => b.maxBid - a.maxBid);
 
   if (pool.length === 0) return { sequence: [], winnerId: null, runnerUpId: null, price: 0 };
@@ -40,7 +38,7 @@ export function buildAuction(verdicts) {
 
   while (price < cap && guard < 22) {
     guard += 1;
-    const next = Math.min(cap, Math.max(STARTING_BID, price + increment(price)));
+    const next = Math.min(cap, price + increment(price));
     const able = [winner, ...rivals].filter(
       (c) =>
         c.bidderId !== leader &&
@@ -54,12 +52,12 @@ export function buildAuction(verdicts) {
   }
 
   if (leader !== winner.bidderId) {
-    price = Math.min(cap, Math.max(STARTING_BID, price));
+    price = Math.min(cap, price);
     sequence.push({ bidderId: winner.bidderId, amount: price });
   }
 
   if (!sequence.length) {
-    price = Math.min(cap, STARTING_BID);
+    price = cap;
     sequence.push({ bidderId: winner.bidderId, amount: price });
   }
 

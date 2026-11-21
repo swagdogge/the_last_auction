@@ -17,6 +17,8 @@ function toGeminiSchema(schema) {
     if (schema.required) out.required = schema.required;
   }
   if (schema.items) out.items = toGeminiSchema(schema.items);
+  if (schema.minItems !== undefined) out.minItems = schema.minItems;
+  if (schema.maxItems !== undefined) out.maxItems = schema.maxItems;
   return out;
 }
 

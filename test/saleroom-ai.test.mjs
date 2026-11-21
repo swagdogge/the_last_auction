@@ -23,6 +23,7 @@ test("AI verdicts are mapped onto the roster and bids read as dollars", async (t
       verdicts: BIDDERS.map((bidder, index) => ({
         bidder_id: index === 0 ? bidder.id.toUpperCase() : bidder.id,
         reaction: `  Reaction ${index}  `,
+        interest: index === 2 ? 0 : 8,
         max_bid_dollars: index === 1 ? 99000000 : index === 2 ? -3 : 7250000.4,
         win_line: `"Won ${index}"`,
         loss_line: null,
@@ -56,14 +57,15 @@ test("AI verdicts are mapped onto the roster and bids read as dollars", async (t
   const body = requestBody(fetchMock);
   const schema = body.generationConfig.responseSchema.properties.verdicts.items.properties;
   assert.deepEqual(schema.bidder_id.enum, BIDDERS.map((bidder) => bidder.id));
+  assert.equal(schema.interest.type, "INTEGER");
   assert.equal(schema.max_bid_dollars.type, "NUMBER");
   assert.equal(schema.max_bid_millions, undefined);
   const prompt = body.contents[0].parts[0].text;
-  assert.match(prompt, /painting number 1 of 3/);
-  assert.match(prompt, /Supper for ghosts/);
+  assert.match(prompt, /Lot 1 of 3/);
+  assert.match(prompt, /<title>Supper for ghosts<\/title>/);
   assert.match(prompt, /max_bid_dollars/);
   assert.doesNotMatch(prompt, /25 million dollars/);
-  assert.doesNotMatch(prompt, /WHAT HAS HAPPENED SO FAR/);
+  assert.doesNotMatch(prompt, /HISTORY/);
   assert.deepEqual(body.contents[0].parts[1].inlineData.data, "AAAA");
 });
 
@@ -91,11 +93,61 @@ test("later lots get a recap of earlier lots in their prompt", async (t) => {
   });
 
   const prompt = requestBody(fetchMock).contents[0].parts[0].text;
-  assert.match(prompt, /WHAT HAS HAPPENED SO FAR/);
-  assert.match(prompt, /Lot 1 "Sunset blob": winner Ines Barlow \(\$1\.2M\)/);
-  assert.match(prompt, /Gordon Rage-say passed/);
-  assert.match(prompt, /Gordon Rage-say's last line: "WHERE IS THE SAUCE\?"/);
-  assert.match(prompt, /must NOT reuse phrases/);
+  assert.match(prompt, /HISTORY/);
+  assert.match(prompt, /Lot 1 "Sunset blob": Ines Barlow won \(\$1\.2M\)\./);
+  assert.match(prompt, /Gordon Rage-say: bored, nothing has moved them/);
+  assert.match(prompt, /Gordon Rage-say: "WHERE IS THE SAUCE\?"/);
+  assert.match(prompt, /LAST LINES \(never reuse their wording or jokes\):/);
+});
+
+test("AI verdicts still map when Gemini returns a bare array of display names", async (t) => {
+  t.mock.method(
+    globalThis,
+    "fetch",
+    async () =>
+      geminiReply(
+        BIDDERS.map((bidder, index) => ({
+          bidder_id: bidder.name,
+          reaction: `Reaction ${index}`,
+          interest: 5,
+          max_bid_dollars: "$1,000,000",
+          win_line: "Mine",
+          loss_line: "Theirs",
+        })),
+      ),
+  );
+
+  const verdicts = await judgePaintingWithKey({ key: "test", image: IMAGE, paintingIndex: 0 });
+
+  assert.deepEqual(
+    verdicts.map((verdict) => verdict.reaction),
+    BIDDERS.map((_, index) => `Reaction ${index}`),
+  );
+  assert.ok(verdicts.every((verdict) => verdict.maxBid === 1000000));
+});
+
+test("AI verdicts without ids fall back to response order", async (t) => {
+  t.mock.method(
+    globalThis,
+    "fetch",
+    async () =>
+      geminiReply(
+        BIDDERS.map((_, index) => ({
+          reaction: `Reaction ${index}`,
+          interest: 5,
+          max_bid_dollars: 250000,
+          win_line: "Mine",
+          loss_line: "Theirs",
+        })),
+      ),
+  );
+
+  const verdicts = await judgePaintingWithKey({ key: "test", image: IMAGE, paintingIndex: 0 });
+
+  assert.deepEqual(
+    verdicts.map((verdict) => verdict.reaction),
+    BIDDERS.map((_, index) => `Reaction ${index}`),
+  );
 });
 
 test("missing AI verdicts fall back per bidder and invalid dollar bids become zero", async (t) => {
@@ -118,11 +170,16 @@ test("missing AI verdicts fall back per bidder and invalid dollar bids become ze
   }
 });
 
-test("AI obituaries are cleaned and mention the right life", async (t) => {
+test("AI obituaries are cleaned, segmented and mention the right life", async (t) => {
   const fetchMock = t.mock.method(globalThis, "fetch", async () =>
     geminiReply({
       title: ' "A Grand Title" ',
-      narration: " first \n\n second ",
+      recurring_bit: "the green line",
+      segments: [
+        { heading: ' "Early" ', text: " first \n second " },
+        { heading: "Middle", text: " middle " },
+        { heading: "Late", text: " late " },
+      ],
       epitaph: null,
     }),
   );
@@ -131,15 +188,37 @@ test("AI obituaries are cleaned and mention the right life", async (t) => {
     key: "test",
     paintings: [IMAGE, IMAGE],
     total: 2500000,
+    narratorId: "earnest",
+    lots: [
+      {
+        title: "Sunset blob",
+        price: 1200000,
+        winnerId: "ines",
+        lastLines: { ines: "Lovely" },
+      },
+    ],
   });
 
   assert.equal(result.title, "A Grand Title");
-  assert.equal(result.narration, "first second");
+  assert.equal(result.narrator, "The Earnest Host");
+  assert.deepEqual(result.segments, [
+    { heading: "Early", text: "first second" },
+    { heading: "Middle", text: "middle" },
+    { heading: "Late", text: "late" },
+  ]);
+  assert.equal(result.narration, "first second\n\nmiddle\n\nlate");
   assert.equal(result.epitaph, "They painted, and then they did not.");
 
-  const prompt = requestBody(fetchMock).contents[0].parts[0].text;
+  const body = requestBody(fetchMock);
+  const schema = body.generationConfig.responseSchema;
+  assert.equal(schema.properties.segments.minItems, 3);
+  assert.deepEqual(schema.required, ["title", "recurring_bit", "segments", "epitaph"]);
+  const prompt = body.contents[0].parts[0].text;
   assert.match(prompt, /exactly 2 works/);
   assert.match(prompt, /\$2,500,000/);
+  assert.match(prompt, /The Earnest Host/);
+  assert.match(prompt, /THE LEDGER/);
+  assert.match(prompt, /Ines Barlow for \$1,200,000, who said: "Lovely"/);
 });
 
 test("Gemini errors reach the caller", async (t) => {

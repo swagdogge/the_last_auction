@@ -2,13 +2,20 @@ import { useEffect, useMemo, useState } from "react";
 import AiErrorChoice from "@/components/game/AiErrorChoice";
 import { composeObituary } from "@/lib/obituary";
 import { formatMoney } from "@/lib/format";
-import { writeObituaryWithKey } from "@/lib/saleroom-ai";
+import { NARRATOR_IDS, writeObituaryWithKey } from "@/lib/saleroom-ai";
 import { paintingForAi } from "@/lib/canvas-image";
 
 const NUMERALS = ["I", "II", "III", "IV", "V"];
 
 export default function Documentary({ works, total, onRestart, geminiKey = null }) {
   const local = useMemo(() => composeObituary(works, total), [works, total]);
+  const lots = useMemo(
+    () => works.map((work) => ({ ...work.record, title: work.title, price: work.price })),
+    [works],
+  );
+  const [narratorId] = useState(
+    () => NARRATOR_IDS[Math.floor(Math.random() * NARRATOR_IDS.length)],
+  );
   const [aiText, setAiText] = useState(null);
   const [aiError, setAiError] = useState(null);
   const [attempt, setAttempt] = useState(0);
@@ -24,7 +31,9 @@ export default function Documentary({ works, total, onRestart, geminiKey = null 
     let alive = true;
     setAiError(null);
     Promise.all(works.map((work) => paintingForAi(work.url)))
-      .then((paintings) => writeObituaryWithKey({ key: geminiKey, paintings, total }))
+      .then((paintings) =>
+        writeObituaryWithKey({ key: geminiKey, paintings, total, lots, narratorId }),
+      )
       .then((result) => {
         if (!alive) return;
         if (!result?.narration) throw new Error("Gemini returned no obituary");
@@ -36,9 +45,16 @@ export default function Documentary({ works, total, onRestart, geminiKey = null 
     return () => {
       alive = false;
     };
-  }, [works, total, geminiKey, attempt]);
+  }, [works, lots, total, geminiKey, narratorId, attempt]);
 
   const text = aiText || local;
+  const segments = text?.segments?.length
+    ? text.segments
+    : String(text?.narration || "")
+        .split(/\n\s*\n/)
+        .map((paragraph) => paragraph.trim())
+        .filter(Boolean)
+        .map((paragraph) => ({ heading: null, text: paragraph }));
 
   return (
     <div className="mx-auto max-w-4xl px-4 pb-16 pt-[56vh]">
@@ -51,6 +67,9 @@ export default function Documentary({ works, total, onRestart, geminiKey = null 
           <span className="gold-text">{text?.title ?? "The Complete Works"}</span>
         </h1>
         <div className="gold-rule mx-auto mt-6 h-px w-32" />
+        <p className="mt-3 text-center text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+          Narrated by {text?.narrator || "The Estate Catalogue"}
+        </p>
 
         <div className="mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2">
           {works.map((work, i) => (
@@ -80,10 +99,15 @@ export default function Documentary({ works, total, onRestart, geminiKey = null 
       )}
 
       <div className="mt-4 min-h-[220px] space-y-5 rounded-sm bg-black/60 px-6 py-6">
-        {text.narration.split(/\n+/).filter(Boolean).map((para, i) => (
-          <p key={i} className="font-body text-[17px] leading-[1.75] text-foreground/85 sm:text-lg">
-            {para}
-          </p>
+        {segments.map((segment, i) => (
+          <div key={i}>
+            {segment.heading && (
+              <h2 className="font-heading text-lg text-foreground/90">{segment.heading}</h2>
+            )}
+            <p className="font-body text-[17px] leading-[1.75] text-foreground/85 sm:text-lg">
+              {segment.text}
+            </p>
+          </div>
         ))}
         <p className="border-l-2 border-white/30 pl-4 pt-2 font-heading text-lg text-foreground/80">
           {text.epitaph}
