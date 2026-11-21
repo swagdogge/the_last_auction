@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import AiErrorChoice from "@/components/game/AiErrorChoice";
 import { composeObituary } from "@/lib/obituary";
 import { formatMoney } from "@/lib/format";
 import { writeObituaryWithKey } from "@/lib/saleroom-ai";
@@ -9,23 +10,33 @@ const NUMERALS = ["I", "II", "III", "IV", "V"];
 export default function Documentary({ works, total, onRestart, geminiKey = null }) {
   const local = useMemo(() => composeObituary(works, total), [works, total]);
   const [aiText, setAiText] = useState(null);
+  const [aiError, setAiError] = useState(null);
+  const [attempt, setAttempt] = useState(0);
+
+  const retry = () => {
+    setAiError(null);
+    setAttempt((value) => value + 1);
+  };
 
   useEffect(() => {
     if (!geminiKey) return;
 
     let alive = true;
+    setAiError(null);
     Promise.all(works.map((work) => paintingForAi(work.url)))
       .then((paintings) => writeObituaryWithKey({ key: geminiKey, paintings, total }))
       .then((result) => {
-        if (alive && result?.narration) setAiText(result);
+        if (!alive) return;
+        if (!result?.narration) throw new Error("Gemini returned no obituary");
+        setAiText(result);
       })
-      .catch(() => {
-        // The local obituary already stands in.
+      .catch((error) => {
+        if (alive) setAiError(error?.message || "Gemini did not respond.");
       });
     return () => {
       alive = false;
     };
-  }, [works, total, geminiKey]);
+  }, [works, total, geminiKey, attempt]);
 
   const text = aiText || local;
 
@@ -56,6 +67,17 @@ export default function Documentary({ works, total, onRestart, geminiKey = null 
           ))}
         </div>
       </div>
+
+      {aiError && geminiKey && (
+        <div className="mt-4">
+          <AiErrorChoice
+            error={aiError}
+            onRetry={retry}
+            onFallback={() => setAiError(null)}
+            onKeySaved={retry}
+          />
+        </div>
+      )}
 
       <div className="mt-4 min-h-[220px] space-y-5 rounded-sm bg-black/60 px-6 py-6">
         {text.narration.split(/\n+/).filter(Boolean).map((para, i) => (

@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { paintingForAi } from "@/lib/canvas-image";
+import AiErrorChoice from "@/components/game/AiErrorChoice";
 import AuctionRoom from "@/components/game/AuctionRoom";
 import AuctionResult from "@/components/game/AuctionResult";
 import CastIntro from "@/components/game/CastIntro";
@@ -56,40 +57,59 @@ export default function AuctionStage({
   const [auction, setAuction] = useState(null);
   const [revealed, setRevealed] = useState(0);
   const [step, setStep] = useState(-1);
+  const [aiError, setAiError] = useState(null);
+  const [attempt, setAttempt] = useState(0);
+
+  const settle = useCallback(
+    (list) => {
+      setVerdicts(list);
+      setAuction(buildAuction(list));
+      setAiError(null);
+      setStatus(paintingIndex === 0 ? "cast" : "reactions");
+    },
+    [paintingIndex],
+  );
+
+  const retry = () => {
+    setAiError(null);
+    setAttempt((value) => value + 1);
+  };
 
   useEffect(() => {
     let alive = true;
+    setAiError(null);
 
-    const settle = (list) => {
-      if (!alive) return;
-      setVerdicts(list);
-      setAuction(buildAuction(list));
-      setStatus(paintingIndex === 0 ? "cast" : "reactions");
+    const finish = (list) => {
+      if (alive) settle(list);
     };
 
     const timer = setTimeout(async () => {
       if (demoVerdicts?.length) {
-        settle(demoVerdicts);
+        finish(demoVerdicts);
         return;
       }
       if (geminiKey) {
         try {
           const image = await paintingForAi(paintingUrl);
           const list = await judgePaintingWithKey({ key: geminiKey, image, paintingIndex });
-          if (list?.length === BIDDERS.length) return settle(list);
+          if (list?.length !== BIDDERS.length) {
+            throw new Error("Gemini returned no verdicts");
+          }
+          finish(list);
         } catch (error) {
-          // The saleroom judges locally when the call cannot be made.
-          console.warn("bidder AI unavailable:", error?.message || error);
+          if (alive) setAiError(error?.message || "Gemini did not respond.");
+          return;
         }
+      } else {
+        finish(judgePaintingLocally(stats, paintingIndex));
       }
-      settle(judgePaintingLocally(stats, paintingIndex));
     }, demoVerdicts?.length ? 900 : 1600);
 
     return () => {
       alive = false;
       clearTimeout(timer);
     };
-  }, [stats, paintingIndex, geminiKey, demoVerdicts, paintingUrl]);
+  }, [stats, paintingIndex, geminiKey, demoVerdicts, paintingUrl, attempt, settle]);
 
   useEffect(() => {
     if (status !== "reactions" || !verdicts.length) return;
@@ -112,6 +132,18 @@ export default function AuctionStage({
   }, [status, step, auction]);
 
   if (status === "judging") {
+    if (aiError) {
+      return (
+        <div className="mx-auto max-w-4xl px-4 pb-16 pt-[30vh]">
+          <AiErrorChoice
+            error={aiError}
+            onRetry={retry}
+            onFallback={() => settle(judgePaintingLocally(stats, paintingIndex))}
+            onKeySaved={retry}
+          />
+        </div>
+      );
+    }
     return <Examining paintingIndex={paintingIndex} />;
   }
 

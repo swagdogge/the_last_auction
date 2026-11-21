@@ -36,6 +36,9 @@ export async function askGeminiJson({ key, prompt, images = [], schema }) {
     if (part) parts.push(part);
   }
 
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 20000);
+
   const send = () =>
     fetch(ENDPOINT, {
       method: "POST",
@@ -48,25 +51,33 @@ export async function askGeminiJson({ key, prompt, images = [], schema }) {
           responseSchema: toGeminiSchema(schema),
         },
       }),
+      signal: controller.signal,
     });
 
-  // The free tier spikes now and then; a short retry rides it out.
-  let response = await send();
-  for (let attempt = 1; attempt < 3 && (response.status === 429 || response.status === 503); attempt += 1) {
-    await new Promise((resolve) => setTimeout(resolve, 700 * attempt));
-    response = await send();
+  try {
+    // The free tier spikes now and then; a short retry rides it out.
+    let response = await send();
+    for (let attempt = 1; attempt < 3 && (response.status === 429 || response.status === 503); attempt += 1) {
+      await new Promise((resolve) => setTimeout(resolve, 700 * attempt));
+      response = await send();
+    }
+
+    if (!response.ok) {
+      throw new Error(`Gemini ${response.status}`);
+    }
+
+    const data = await response.json();
+    const text = (data?.candidates?.[0]?.content?.parts || [])
+      .map((part) => part.text || "")
+      .join("")
+      .trim();
+
+    if (!text) throw new Error("Gemini returned nothing");
+    return JSON.parse(text);
+  } catch (error) {
+    if (error?.name === "AbortError") throw new Error("Gemini timed out");
+    throw error;
+  } finally {
+    clearTimeout(timeout);
   }
-
-  if (!response.ok) {
-    throw new Error(`Gemini ${response.status}`);
-  }
-
-  const data = await response.json();
-  const text = (data?.candidates?.[0]?.content?.parts || [])
-    .map((part) => part.text || "")
-    .join("")
-    .trim();
-
-  if (!text) throw new Error("Gemini returned nothing");
-  return JSON.parse(text);
 }

@@ -74,27 +74,36 @@ function Game() {
     setPhase(next.length >= PAINTING_COUNT ? "documentary" : "paint");
   };
 
-  const restart = () => {
+  const resetLife = () => {
     setWorks([]);
     setCurrentUrl(null);
     setCurrentStats(null);
     setCurrentPreset(null);
     setPickedPreset(null);
-    setPhase("paint");
+  };
+
+  // Starting from the title always means a real game, never a leftover demo.
+  const startGame = () => {
+    resetLife();
+    setDemoMode(false);
+    setPhase("key");
   };
 
   const startDemo = () => {
+    resetLife();
     setDemoMode(true);
-    setPickedPreset(null);
+    setPhase("paint");
+  };
+
+  const restart = () => {
+    resetLife();
+    // "Another life" stays in whichever mode the player is already in.
     setPhase("paint");
   };
 
   const goToMenu = () => {
-    setWorks([]);
-    setCurrentUrl(null);
-    setCurrentStats(null);
-    setCurrentPreset(null);
-    setPickedPreset(null);
+    resetLife();
+    setDemoMode(false);
     setPhase("title");
   };
 
@@ -106,7 +115,16 @@ function Game() {
         {phase === "title" && (
           <>
             <MuseumBackdrop />
-            <TitleScreen onStart={() => setPhase("paint")} onStartDemo={startDemo} />
+            <TitleScreen onStart={startGame} onStartDemo={startDemo} />
+          </>
+        )}
+
+        {phase === "key" && (
+          <>
+            <AtelierBackdrop />
+            <div className="mx-auto flex min-h-screen max-w-2xl items-center justify-center px-6 py-16">
+              <ApiKeyPanel onContinue={() => setPhase("paint")} />
+            </div>
           </>
         )}
 
@@ -224,11 +242,14 @@ function Game() {
 }
 
 function TitleScreen({ onStart, onStartDemo }) {
+  const giveAGoClass = "text-[#e6e6fa] underline-offset-2 hover:underline";
+  const base44Class = "text-[#ffa500] underline-offset-2 hover:underline";
+
   return (
     <div className="mx-auto flex min-h-screen max-w-6xl flex-col justify-center px-6 py-16">
       <div className="mx-auto w-full max-w-2xl rounded-sm bg-black/60 px-6 py-8 sm:px-10">
         <p className="text-center text-[10px] uppercase tracking-[0.25em] text-foreground/50">
-          Game Garage (Give(a)Go x Base44)
+          Game Garage (<a href="https://www.giveago.co/" target="_blank" rel="noreferrer" className={giveAGoClass}>Give(a)Go</a> x <a href="https://app.base44.com/" target="_blank" rel="noreferrer" className={base44Class}>Base44</a>)
         </p>
 
         <h1 className="mt-8 text-center font-heading text-5xl leading-[0.95] sm:text-7xl md:text-8xl">
@@ -260,9 +281,8 @@ function TitleScreen({ onStart, onStartDemo }) {
           </button>
           <DemoButton onStart={onStartDemo} />
         </div>
-        <ApiKeyPanel />
-        <p className="bg-black/60 px-3 py-1.5 text-[11px] text-muted-foreground">
-          vibecoded by Base44, in cooperation with swagdogge
+        <p className="text-center text-[11px] text-muted-foreground">
+          Vibecoded by swagdogge with Base44<br />during the &quot;Game Garage (Give(a)Go x Base44)&quot; Event<br />21.11.2026, Heilbronn<br />no squirrels harmed
         </p>
         {import.meta.env.DEV && (
           <Link
