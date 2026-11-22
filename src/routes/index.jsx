@@ -1,5 +1,5 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import PaintCanvas from "@/components/game/PaintCanvas";
 import Palette from "@/components/game/Palette";
 import BrushTools from "@/components/game/BrushTools";
@@ -128,9 +128,9 @@ function Game() {
 
   // The printer is part of the scenery, so it lives behind the page. A click
   // simply opens the hidden picker; the canvas handles the cover-fit itself.
-  const handlePrinterClick = () => {
+  const handlePrinterClick = useCallback(() => {
     uploadRef.current?.click();
-  };
+  }, []);
 
   const handleImageUpload = async (event) => {
     const file = event.target.files?.[0];
