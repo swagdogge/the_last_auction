@@ -16,6 +16,7 @@ import MuseumBackdrop from "@/components/game/MuseumBackdrop";
 import Easel from "@/components/game/Easel";
 import NameWorkDialog from "@/components/game/NameWorkDialog";
 import { BIDDERS, PAINTING_COUNT } from "@/lib/bidders";
+import { opacityFromTransparency } from "@/lib/studio-tools";
 import { usePlayerKey } from "@/lib/player-key";
 import { formatMoney } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -39,9 +40,11 @@ function Game() {
   const [works, setWorks] = useState([]);
   const [currentUrl, setCurrentUrl] = useState(null);
   const [currentStats, setCurrentStats] = useState(null);
-  const [color, setColor] = useState("#141414");
-  const [size, setSize] = useState(16);
+  const [color, setColor] = useState("#0d0305");
+  const [size, setSize] = useState(20);
+  const [transparency, setTransparency] = useState(0);
   const [tool, setTool] = useState("brush");
+  const [canvasWidth, setCanvasWidth] = useState(430);
   const playerKey = usePlayerKey();
   const [demoMode, setDemoMode] = useState(false);
   const [pickedPreset, setPickedPreset] = useState(null);
@@ -186,10 +189,14 @@ function Game() {
             <div className="mt-6 grid gap-6 lg:grid-cols-[auto_1fr_auto] lg:items-start">
               <div className="order-2 lg:order-1 lg:pt-8">
                 <BrushTools
+                  color={color}
                   size={size}
                   tool={tool}
+                  transparency={transparency}
+                  canvasWidth={canvasWidth}
                   onSize={setSize}
                   onTool={setTool}
+                  onTransparency={setTransparency}
                   onUndo={() => canvasRef.current?.undo()}
                   onClear={() => canvasRef.current?.clear()}
                 />
@@ -197,7 +204,14 @@ function Game() {
 
               <div className="order-1 lg:order-2">
                 <Easel>
-                  <PaintCanvas ref={canvasRef} color={color} size={size} tool={tool} />
+                  <PaintCanvas
+                    ref={canvasRef}
+                    color={color}
+                    size={size}
+                    tool={tool}
+                    opacity={opacityFromTransparency(transparency)}
+                    onDisplayWidth={setCanvasWidth}
+                  />
                 </Easel>
               </div>
 

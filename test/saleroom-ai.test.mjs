@@ -64,6 +64,13 @@ test("AI verdicts are mapped onto the roster and bids read as dollars", async (t
   assert.match(prompt, /Lot 1 of 3/);
   assert.match(prompt, /<title>Supper for ghosts<\/title>/);
   assert.match(prompt, /max_bid_dollars/);
+  assert.equal((prompt.match(/THIS LOT'S MOVE:/g) || []).length, BIDDERS.length);
+  for (const bidder of BIDDERS) {
+    assert.ok(
+      bidder.moves.some((move) => prompt.includes(`THIS LOT'S MOVE: ${move}`)),
+      `${bidder.id} should have a picked move in the prompt`,
+    );
+  }
   assert.doesNotMatch(prompt, /25 million dollars/);
   assert.doesNotMatch(prompt, /HISTORY/);
   assert.deepEqual(body.contents[0].parts[1].inlineData.data, "AAAA");
