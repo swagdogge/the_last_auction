@@ -52,6 +52,7 @@ function Game() {
   const [currentTitle, setCurrentTitle] = useState("");
   const [naming, setNaming] = useState(false);
   const canvasRef = useRef(null);
+  const uploadRef = useRef(null);
 
   const total = works.reduce((sum, w) => sum + w.price, 0);
   const lotHistory = useMemo(() => works.map((work) => work.record).filter(Boolean), [works]);
@@ -125,9 +126,22 @@ function Game() {
     setPhase("title");
   };
 
+  // The printer is part of the scenery, so it lives behind the page. A click
+  // simply opens the hidden picker; the canvas handles the cover-fit itself.
+  const handlePrinterClick = () => {
+    uploadRef.current?.click();
+  };
+
+  const handleImageUpload = async (event) => {
+    const file = event.target.files?.[0];
+    // Reset now so picking the same file again still fires onChange.
+    event.target.value = "";
+    if (file) await canvasRef.current?.loadImage(file);
+  };
+
   return (
-    <div className="min-h-screen text-foreground">
-      <div className="min-h-screen">
+    <div className={cn("min-h-screen text-foreground", phase === "paint" && "pointer-events-none")}>
+      <div className={cn("min-h-screen", phase === "paint" && "pointer-events-none")}>
         {phase !== "title" && <MenuButton onConfirm={goToMenu} />}
 
         {phase === "title" && (
@@ -148,9 +162,9 @@ function Game() {
 
         {phase === "paint" && (
           <>
-            <AtelierBackdrop showCat />
-            <div className="mx-auto max-w-7xl px-4 py-6 sm:px-8 sm:py-8">
-            <header className="flex items-end justify-between border-b border-white/10 pb-4">
+            <AtelierBackdrop showCat onPrinterClick={handlePrinterClick} />
+            <div className="pointer-events-none mx-auto max-w-7xl px-4 py-6 sm:px-8 sm:py-8">
+            <header className="pointer-events-auto flex items-end justify-between border-b border-white/10 pb-4">
               <div>
                 <p className="text-[10px] uppercase tracking-[0.25em] text-foreground/50">The studio</p>
                 <h1 className="mt-1 font-heading text-2xl sm:text-3xl">
@@ -182,12 +196,12 @@ function Game() {
             </header>
 
             {demoMode ? (
-              <div className="mx-auto mt-6 max-w-4xl">
+              <div className="pointer-events-auto mx-auto mt-6 max-w-4xl">
                 <PresetPicker selectedId={pickedPreset?.id} onPick={setPickedPreset} />
               </div>
             ) : (
-            <div className="mt-6 grid gap-6 lg:grid-cols-[auto_1fr_auto] lg:items-start">
-              <div className="order-2 lg:order-1 lg:pt-8">
+            <div className="pointer-events-none mt-6 grid gap-6 lg:grid-cols-[auto_1fr_auto] lg:items-start">
+              <div className="pointer-events-auto order-2 lg:order-1 lg:pt-8">
                 <BrushTools
                   color={color}
                   size={size}
@@ -202,7 +216,7 @@ function Game() {
                 />
               </div>
 
-              <div className="order-1 lg:order-2">
+              <div className="pointer-events-auto order-1 lg:order-2">
                 <Easel>
                   <PaintCanvas
                     ref={canvasRef}
@@ -221,7 +235,7 @@ function Game() {
             </div>
             )}
 
-            <div className="mt-8 flex flex-col items-center gap-3">
+            <div className="pointer-events-auto mt-8 flex flex-col items-center gap-3">
               <button
                 type="button"
                 onClick={handleSell}
@@ -275,6 +289,16 @@ function Game() {
             onCancel={() => setNaming(false)}
           />
         )}
+
+        <input
+          ref={uploadRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleImageUpload}
+          aria-hidden="true"
+          tabIndex={-1}
+        />
       </div>
     </div>
   );

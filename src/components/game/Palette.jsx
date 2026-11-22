@@ -9,7 +9,7 @@ const WELLS = ROWS.flatMap((cy) => COLS.map((cx) => ({ cx, cy })));
 
 export default function Palette({ color, onChange }) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className="pointer-events-none flex flex-col gap-2">
       <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">Pigments</span>
 
       <div className="relative mx-auto w-full max-w-[280px]">
@@ -56,7 +56,7 @@ export default function Palette({ color, onChange }) {
                 top: `${(well.cy / 328) * 100}%`,
               }}
               className={cn(
-                "absolute aspect-square w-[10%] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-[#141414] transition-transform duration-150",
+                "pointer-events-auto absolute aspect-square w-[10%] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-[#141414] transition-transform duration-150",
                 color === hex
                   ? "scale-110 ring-2 ring-white"
                   : "hover:scale-110",

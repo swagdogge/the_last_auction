@@ -10,7 +10,7 @@ export default function NameWorkDialog({ number, onConfirm, onCancel }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 px-6"
+      className="pointer-events-auto fixed inset-0 z-50 flex items-center justify-center bg-black/75 px-6"
       role="dialog"
       aria-modal="true"
       aria-labelledby="work-title-heading"

@@ -1,5 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import { getStroke } from "perfect-freehand";
+import { coverRect } from "@/lib/canvas-image";
 import { analyzeCanvas } from "@/lib/paint-analysis";
 import {
   advanceRollerDirection,
@@ -422,6 +423,36 @@ const PaintCanvas = forwardRef(function PaintCanvas(
       const ctx = canvasRef.current.getContext("2d");
       ctx.fillStyle = PAPER;
       ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+    },
+    loadImage(file) {
+      if (!file || !file.type.startsWith("image/")) return Promise.resolve(false);
+      return new Promise((resolve) => {
+        const url = URL.createObjectURL(file);
+        const image = new window.Image();
+        image.onload = () => {
+          URL.revokeObjectURL(url);
+          activeStroke.current = null;
+          rollerStroke.current = null;
+          pushHistory();
+          const rect = coverRect(
+            image.naturalWidth,
+            image.naturalHeight,
+            CANVAS_W,
+            CANVAS_H,
+          );
+          const ctx = canvasRef.current.getContext("2d");
+          ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+          ctx.fillStyle = PAPER;
+          ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+          ctx.drawImage(image, rect.x, rect.y, rect.width, rect.height);
+          resolve(true);
+        };
+        image.onerror = () => {
+          URL.revokeObjectURL(url);
+          resolve(false);
+        };
+        image.src = url;
+      });
     },
     toDataURL() {
       return canvasRef.current.toDataURL("image/png");

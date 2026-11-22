@@ -1,3 +1,19 @@
+/** Rectangle for drawing an image so it covers the canvas; overflow is cropped. */
+export function coverRect(sourceWidth, sourceHeight, targetWidth, targetHeight) {
+  if (!sourceWidth || !sourceHeight) {
+    return { x: 0, y: 0, width: targetWidth, height: targetHeight };
+  }
+  const scale = Math.max(targetWidth / sourceWidth, targetHeight / sourceHeight);
+  const width = sourceWidth * scale;
+  const height = sourceHeight * scale;
+  return {
+    x: (targetWidth - width) / 2,
+    y: (targetHeight - height) / 2,
+    width,
+    height,
+  };
+}
+
 /** Shrinks a canvas data URL so a painting can travel inside a request. */
 export function paintingForAi(dataUrl, maxWidth = 512) {
   return new Promise((resolve, reject) => {

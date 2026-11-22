@@ -4,7 +4,7 @@ import StudioCat from "@/components/game/StudioCat";
 // The studio, dim enough for white text to sit on it: bare wall, one crooked
 // sheet taped up, a shelf of jars, a window and the floor. The easel itself is
 // built in the page (see Easel.jsx) so the canvas really hangs on it.
-export default function AtelierBackdrop({ showCat = false }) {
+export default function AtelierBackdrop({ showCat = false, onPrinterClick }) {
   return (
     <Backdrop scrim="">
       <rect width="320" height="200" fill="#6a6355" />
@@ -50,6 +50,22 @@ export default function AtelierBackdrop({ showCat = false }) {
       <rect x="244" y="132" width="42" height="8" fill="#6b4d36" />
       <rect x="250" y="140" width="6" height="24" fill="#553c28" />
       <rect x="274" y="140" width="6" height="24" fill="#553c28" />
+
+      {/* printer, left where it always sits; only clickable in the studio */}
+      <g
+        onClick={onPrinterClick}
+        style={onPrinterClick ? { pointerEvents: "all" } : undefined}
+      >
+        <rect x="254" y="92" width="26" height="9" fill="#f7f4e8" />
+        <rect x="254" y="92" width="26" height="2" fill="#c5b7cb" />
+        <rect x="246" y="100" width="42" height="28" fill="#3c3444" />
+        <rect x="246" y="100" width="42" height="5" fill="#6e576e" />
+        <rect x="250" y="105" width="34" height="3" fill="#241c15" />
+        <rect x="252" y="118" width="30" height="4" fill="#6e576e" />
+        <rect x="252" y="124" width="30" height="4" fill="#241c15" />
+        <rect x="280" y="108" width="4" height="4" fill="#c5b7cb" />
+        <rect x="250" y="128" width="36" height="4" fill="#5f4f47" />
+      </g>
 
       {showCat && <StudioCat />}
 
