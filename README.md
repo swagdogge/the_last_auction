@@ -1,8 +1,7 @@
 ## HOW TO PLAY
 - visit https://the-last-auction.web.app/
-- click on AI bidders to insert the Gemini API key to use, you can get a free one at
-  https://aistudio.google.com/api-keys
-- click "enter the studio"
+- click "enter the studio", to play with real AI bidder, you need a Gemini API key,
+  you can get a free one at https://aistudio.google.com/api-keys
 
 ## TESTING
 

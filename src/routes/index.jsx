@@ -145,7 +145,7 @@ function Game() {
 
         {phase === "paint" && (
           <>
-            <AtelierBackdrop />
+            <AtelierBackdrop showCat />
             <div className="mx-auto max-w-7xl px-4 py-6 sm:px-8 sm:py-8">
             <header className="flex items-end justify-between border-b border-white/10 pb-4">
               <div>

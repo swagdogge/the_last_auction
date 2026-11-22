@@ -1,9 +1,10 @@
 import Backdrop from "@/components/game/Backdrop";
+import StudioCat from "@/components/game/StudioCat";
 
 // The studio, dim enough for white text to sit on it: bare wall, one crooked
 // sheet taped up, a shelf of jars, a window and the floor. The easel itself is
 // built in the page (see Easel.jsx) so the canvas really hangs on it.
-export default function AtelierBackdrop() {
+export default function AtelierBackdrop({ showCat = false }) {
   return (
     <Backdrop scrim="">
       <rect width="320" height="200" fill="#6a6355" />
@@ -49,6 +50,8 @@ export default function AtelierBackdrop() {
       <rect x="244" y="132" width="42" height="8" fill="#6b4d36" />
       <rect x="250" y="140" width="6" height="24" fill="#553c28" />
       <rect x="274" y="140" width="6" height="24" fill="#553c28" />
+
+      {showCat && <StudioCat />}
 
       {/* cut-out rim, same white edge the portraits have */}
       <rect width="3" height="200" fill="#f7f7f2" />
