@@ -97,10 +97,6 @@ That writes `dist/the-last-auction-html5.zip`. Upload the zip to itch.io as an H
 - Inspiration for game direction: https://store.steampowered.com/app/582550/Passpartout_The_Starving_Artist/
 - Similar project I made before: https://scratch.mit.edu/projects/1182440503/
 
-## AI usage
- 
-This is a vibecoded project. That is in the nature of the event it was made for. After the event I exported the project and added some human touches, but they only make up a small part of the code.
- 
 ## Background
  
 The Last Auction was made at the Game Garage (Give(a)Go x Base44) event on 21.11.2026 in Heilbronn. The task was to build a game with Base44, and this one is for track 2: AI-controlled NPCs.
@@ -112,16 +108,12 @@ You can check its Steam page here: https://store.steampowered.com/app/582550/Pas
 
 More about Give(a)Go: https://www.giveago.co/
 Base44: https://app.base44.com/
+
+
+## AI usage
  
-## Notes on building with Base44
- 
-*This reflects my own experience with the free tier in November 2026. I'm not affiliated with Base44, and the limits may have changed since.*
- 
-- **The code was better than I expected.** It was hidden from plain sight, but once I found it, it was reasonably well structured, probably helped by this being a small 2D game.
-- **Free tier is "look, don't touch."** I couldn't edit the code, and code export and the GitHub integration were paid features.
-- **Getting the code out.** I asked Base44's AI agent for help, and it built a download page inside the project so I could access the files.
-- **Going independent.** My integration credits ran out quickly, so the agent switched all AI calls to the free Gemini API. As a last step it rewrote the project so it could be hosted on Firebase instead of Base44.
-- **The agent itself impressed me.** It kept offering workable solutions instead of giving up or hallucinating. I dont't know for sure how it works, but I suspect a lot of that comes from it searching Base44's own documentation, which stops it from inventing features that don't exist.
+This is a vibecoded project. That is in the nature of the event it was made for. After the event I exported the project and added some human touches, but they only make up a small part of the code.
+
 ## License
  
 [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) — see [LICENSE](LICENSE). You may share and adapt this project for noncommercial purposes, with attribution and under the same license. Selling it or using it commercially is not permitted. Third-party assets keep their own terms.
