@@ -54,21 +54,21 @@ Each bidder has their own taste, quirks and sense of humour, so the same paintin
 
 This game was built for the AI-controlled NPCs track, so this is the interesting part.
 
-- **One call for the whole room.** With a Gemini key, each lot is judged in a single request to `gemini-3.5-flash-lite`. The player's actual canvas image is attached, and a JSON schema asks for six verdicts (a reaction, private interest and maximum bid), an ordered bidding script, and the winner's and runner-up's closing lines.
+- **One call for all bidders.** With a Gemini key, each lot is judged in a single request to `gemini-3.5-flash-lite`. The player's actual canvas image is attached, and a JSON schema asks for six verdicts (a reaction, private interest and maximum bid), an ordered bidding script, and the winner's and runner-up's closing lines.
 - **Personas, with a rotating comic angle.** The six bidders keep their own tastes and contradictions from `src/lib/bidders.js`. Each lot also gets one of that bidder's existing `moves`; the game picks it by lot index, so the angle changes every lot without inventing catchphrases or new joke templates.
 - **The AI writes the auction; the game keeps it honest.** The script is replayed through `replayScript()` under the house rules: a $500,000 opening, at least 5% between bids, no bid above a bidder's own ceiling, no self-overbidding, and at most 16 bids. Illegal bids are dropped or folded into the last legal bid. If the AI's declared winner loses their last bid to the clamp, the game tries to restore a legal winning bid and keeps the AI's final lines.
 - **Memory across lots.** Before lots 2 and 3, the prompt gets a compact ledger of earlier sales: who won, who lost, who passed and what people last said. Previous winners are nudged to sit the next lot out; the prompt also forbids the same bidder winning twice. Bidders are told not to reuse old jokes, objects or wording.
 - **No key? Local/demo mode still plays.** A rules-based local jury writes reactions and secret ceilings, and the game builds the bidding war itself. In that mode no painting or prompt is sent to Gemini.
 - **The finale.** One final call sees all three images and the sale ledger, then writes the retrospective in a randomly chosen narrator voice: the earnest host, the petty omniscient narrator, or the overqualified historian. Buyer lines are passed along as optional colour.
-## Run it locally
+## Developer Instructions
  
-Check the core game logic:
+Testing core game logic (used for testing during development):
  
 ```bash
 npm test
 ```
  
-Run the whole site locally:
+Run whole site locally:
  
 ```bash
 npm install   # only if node_modules is missing
@@ -86,8 +86,6 @@ pkill -f "vite dev --config vite.config.firebase.js"
 ```bash
 npm run build:itch
 ```
-
-That writes `dist/the-last-auction-html5.zip`. Upload the zip to itch.io as an HTML5 game and tick "This game will be playable in browser". The zip contains `index.html`, relative asset paths, the license, and a short readme. No server needed.
 
 ## Credits
  
