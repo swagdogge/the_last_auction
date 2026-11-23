@@ -1,5 +1,11 @@
 import CrudePortrait from "@/components/game/CrudePortrait";
+import TypedLine from "@/components/game/TypedLine";
 import { cn } from "@/lib/utils";
+
+export const IMPRESSION_SIZE = {
+  julian: "text-[15px]",
+  leopold: "text-[16px]",
+};
 
 export default function BidderCard({
   bidder,
@@ -8,29 +14,37 @@ export default function BidderCard({
   state = "idle",
   line,
   bid,
+  passed = false,
   className,
 }) {
   const isLead = state === "lead";
   const isWin = state === "win";
+  const isOut = state === "out";
 
   return (
     <div
       className={cn(
-        "group relative overflow-hidden rounded-sm border bg-card/70 transition-all duration-500",
+        "group relative flex h-full flex-col overflow-hidden rounded-sm border bg-card/70 transition-all duration-500",
         isLead || isWin
           ? "border-primary/70 shadow-[3px_3px_0_0_hsl(0_0%_100%/0.3)]"
-          : "border-white/10",
-        state === "out" && "opacity-45",
+          : isOut
+            ? "border-white/5 opacity-50"
+            : "border-white/10",
         className,
       )}
     >
-      <div className="relative aspect-[4/5] w-full overflow-hidden bg-black/40">
+      <div className="relative aspect-[4/5] w-full shrink-0 overflow-hidden bg-black/40">
         <CrudePortrait
           bidderId={bidder.id}
           className={cn(
             "transition-all duration-700",
-            revealed ? "grayscale-[15%]" : "blur-md grayscale",
-            isLead || isWin ? "grayscale-0" : "group-hover:scale-[1.02]",
+            !revealed
+              ? "blur-md grayscale"
+              : isOut
+                ? "grayscale"
+                : isLead || isWin
+                  ? "grayscale-0"
+                  : "grayscale-[15%] group-hover:scale-[1.02]",
           )}
         />
 
@@ -49,27 +63,33 @@ export default function BidderCard({
           </div>
         )}
 
-        {isLead && (
-          <div className="absolute right-2 top-2 rounded-sm bg-primary px-2 py-1 font-mono text-[10px] font-medium text-primary-foreground">
-            {bid}
+        {(bid !== undefined || passed) && (
+          <div
+            className={cn(
+              "absolute right-2 top-2 rounded-sm border px-2 py-1 font-mono leading-tight",
+              passed
+                ? "border-white/20 bg-[#141414] text-[9px] uppercase tracking-[0.14em] text-foreground/70"
+                : "text-[10px] font-medium",
+              isLead || isWin
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-white/20 bg-[#141414] text-foreground/85",
+            )}
+          >
+            {passed ? "PASS" : bid}
           </div>
         )}
         {isWin && (
-          <div className="absolute right-2 top-2 rounded-sm bg-primary px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.2em] text-primary-foreground">
+          <div className="absolute right-2 top-9 rounded-sm bg-primary px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.2em] text-primary-foreground">
             Sold
           </div>
         )}
       </div>
 
       {line && (
-        <p
-          className={cn(
-            "border-t border-white/10 bg-black/30 px-3 py-2.5 text-[13px] leading-snug text-foreground/85",
-            bidder.voice,
-          )}
-        >
-          “{line}”
-        </p>
+        <TypedLine
+          text={line}
+          className={cn("flex-1", IMPRESSION_SIZE[bidder.id], bidder.voice)}
+        />
       )}
     </div>
   );

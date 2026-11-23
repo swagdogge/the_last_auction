@@ -128,7 +128,7 @@ const LINES = {
     rave: [
       "no cap this {color} goes hard. i would frame this immediately.",
       "this is a reaction image waiting to happen. huge.",
-      "it reads at thumbnail size and that's the whole game.",
+      "one look and i already know when i'd send this.",
       "this is so real. i'm putting it in the group chat.",
     ],
     mixed: [

@@ -49,6 +49,7 @@ export async function askGeminiJson({ key, prompt, images = [], schema, onRaw })
         contents: [{ role: "user", parts }],
         generationConfig: {
           temperature: 1,
+          maxOutputTokens: 4096,
           responseMimeType: "application/json",
           responseSchema: toGeminiSchema(schema),
         },

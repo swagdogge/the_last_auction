@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Auctioneer from "@/components/game/Auctioneer";
 import BidderCard from "@/components/game/BidderCard";
 import { BIDDERS } from "@/lib/bidders";
 import { formatCompact, formatMoney } from "@/lib/format";
@@ -16,15 +17,23 @@ export default function AuctionRoom({
   title = null,
   verdicts,
   revealed,
+  revealOrder,
   debugRaw = null,
   leaderId,
   price,
   priceLabel,
   caption,
   action,
+  auctioneer,
+  bidsById = {},
+  commentsById = {},
+  showReactions = false,
+  outIds = [],
+  passIds = [],
 }) {
   const byId = Object.fromEntries(verdicts.map((v) => [v.bidderId, v]));
   const [showDebug, setShowDebug] = useState(false);
+  const order = revealOrder?.length ? revealOrder : BIDDERS.map((b) => b.id);
 
   return (
     <div className="mx-auto max-w-5xl px-4 pb-16 pt-[60vh]">
@@ -48,19 +57,31 @@ export default function AuctionRoom({
         </div>
       </div>
 
+      {auctioneer?.line && <Auctioneer line={auctioneer.line} tone={auctioneer.tone} />}
       {action && <div className="mt-4">{action}</div>}
 
       <div className="mt-6 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6">
-        {BIDDERS.map((bidder, index) => {
+        {order.map((id) => {
+          const bidder = BIDDERS.find((b) => b.id === id);
+          if (!bidder) return null;
           const verdict = byId[bidder.id];
           const isLeader = leaderId === bidder.id;
+          const bid = bidsById[bidder.id];
+          const passed = passIds.includes(bidder.id);
           return (
             <BidderCard
               key={bidder.id}
               bidder={bidder}
-              state={isLeader ? "lead" : "idle"}
-              bid={isLeader ? formatCompact(price) : undefined}
-              line={index < revealed ? verdict?.reaction : undefined}
+              state={isLeader ? "lead" : outIds.includes(bidder.id) || passed ? "out" : "idle"}
+              passed={passed}
+              bid={bid !== undefined ? formatCompact(bid) : undefined}
+              line={
+                showReactions
+                  ? order.indexOf(bidder.id) < revealed
+                    ? verdict?.reaction
+                    : undefined
+                  : commentsById[bidder.id]
+              }
             />
           );
         })}

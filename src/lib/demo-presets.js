@@ -52,7 +52,7 @@ export const DEMO_PRESETS = [
       },
       {
         bidderId: "chad",
-        reaction: "this is one colour and it still goes hard. thumbnail of the year.",
+        reaction: "this is one colour and it still goes hard. i get the hype.",
         maxBid: 7500000,
         winLine: "bought the red. no cap.",
         lossLine: "the red went for more than my rent.",
