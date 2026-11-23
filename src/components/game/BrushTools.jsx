@@ -140,9 +140,6 @@ export default function BrushTools({
             );
           })}
         </div>
-        <p className="text-[9px] leading-snug text-muted-foreground">
-          Shown at the canvas's real on-screen width.
-        </p>
       </div>
 
       <div className="flex flex-col gap-2">

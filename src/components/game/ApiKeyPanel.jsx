@@ -55,7 +55,7 @@ export default function ApiKeyPanel({ onContinue }) {
       <h2 className="mt-3 text-center font-heading text-2xl">Who should judge your work?</h2>
       <p className="mt-4 text-[12px] leading-relaxed text-foreground/65">
         With your own Google Gemini key, six AI bidders look at each painting. Without one, the
-        saleroom&apos;s local jury judges every canvas. The game is free and complete either way.
+        saleroom&apos;s local jury judges every canvas. Either way works just fine.
       </p>
 
       <form onSubmit={save} className="mt-7">
@@ -95,11 +95,10 @@ export default function ApiKeyPanel({ onContinue }) {
         </div>
 
         <p className="mt-4 text-[10px] leading-relaxed text-muted-foreground">
-          The key is only used to ask Google&apos;s Gemini API to judge each canvas: your browser
-          talks to Google directly, with no server or account in between. Four requests per life:
-          one per canvas, one for the documentary. The key is kept in this tab&apos;s memory only,
-          never saved, and sent to nobody but Google. Anything typed into a web page is visible to
-          that page, so use a key you can revoke.
+          The key is used only to ask Gemini to judge your canvases and write the documentary. Your
+          browser talks to Google directly; there is no server here. That is four requests per life.
+          The key stays in this tab&apos;s memory, is never saved, and goes only to Google. Use a key
+          you can revoke.
         </p>
       </form>
 

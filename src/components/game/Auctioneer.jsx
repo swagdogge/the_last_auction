@@ -44,7 +44,7 @@ export default function Auctioneer({ line, tone = "normal" }) {
 
       <div className="flex min-w-0 flex-1 flex-col justify-center">
         <p className="text-[9px] uppercase tracking-[0.3em] text-muted-foreground">
-          The auctioneer
+          auctioneer
         </p>
         <p
           className={cn(

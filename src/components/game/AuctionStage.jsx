@@ -40,9 +40,6 @@ function Examining({ paintingIndex, title }) {
           />
         ))}
       </div>
-      <p className="mx-auto mt-4 w-fit bg-black/60 px-3 py-1.5 text-center text-[11px] text-muted-foreground">
-        Six pairs of eyes, one painting, no explanations.
-      </p>
     </div>
   );
 }
@@ -261,7 +258,7 @@ export default function AuctionStage({
         passIds={passIds}
         price={auction.price}
         priceLabel="Hammer price"
-        caption="Bidding closed. Their verdicts are in — read them all, then look."
+        caption="Bidding closed."
         auctioneer={auctioneer}
         action={
           <button

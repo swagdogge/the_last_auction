@@ -40,7 +40,7 @@ export default function AuctionRoom({
       <div className="rounded-sm bg-black/60 px-5 py-4 sm:flex sm:items-end sm:justify-between sm:gap-6">
         <div>
           <p className="text-[10px] uppercase tracking-[0.3em] text-foreground/60">
-            Lot {paintingIndex + 1} · on the easel
+            Lot {paintingIndex + 1}
           </p>
           {title && <p className="mt-1 font-heading text-lg text-foreground/85">{title}</p>}
           {caption && (
@@ -52,7 +52,7 @@ export default function AuctionRoom({
             {priceLabel || (price > 0 ? "Current bid" : "Opening bid")}
           </p>
           <p className="money mt-1 font-mono text-2xl">
-            {price > 0 ? formatMoney(price) : "—"}
+            {price > 0 ? formatMoney(price) : "---"}
           </p>
         </div>
       </div>

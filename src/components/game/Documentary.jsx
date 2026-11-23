@@ -18,18 +18,31 @@ export default function Documentary({ works, total, onRestart, geminiKey = null 
   );
   const [aiText, setAiText] = useState(null);
   const [aiError, setAiError] = useState(null);
+  const [localFallback, setLocalFallback] = useState(false);
   const [attempt, setAttempt] = useState(0);
+  const [dots, setDots] = useState(0);
+
+  const loading = Boolean(geminiKey) && !aiText && !aiError && !localFallback;
 
   const retry = () => {
     setAiError(null);
+    setLocalFallback(false);
     setAttempt((value) => value + 1);
   };
+
+  useEffect(() => {
+    if (!loading) return;
+    setDots(0);
+    const timer = setInterval(() => setDots((value) => (value + 1) % 4), 350);
+    return () => clearInterval(timer);
+  }, [loading, attempt]);
 
   useEffect(() => {
     if (!geminiKey) return;
 
     let alive = true;
     setAiError(null);
+    setLocalFallback(false);
     Promise.all(works.map((work) => paintingForAi(work.url)))
       .then((paintings) =>
         writeObituaryWithKey({ key: geminiKey, paintings, total, lots, narratorId }),
@@ -46,6 +59,18 @@ export default function Documentary({ works, total, onRestart, geminiKey = null 
       alive = false;
     };
   }, [works, lots, total, geminiKey, narratorId, attempt]);
+
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-4xl px-4 pb-16 pt-[56vh]">
+        <div className="rounded-sm bg-black/60 px-6 py-8 text-center">
+          <p className="font-body text-[17px] text-foreground/85" aria-live="polite">
+            (documentary is being generated{".".repeat(dots)})
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   const text = aiText || local;
   const segments = text?.segments?.length
@@ -92,7 +117,10 @@ export default function Documentary({ works, total, onRestart, geminiKey = null 
           <AiErrorChoice
             error={aiError}
             onRetry={retry}
-            onFallback={() => setAiError(null)}
+            onFallback={() => {
+              setLocalFallback(true);
+              setAiError(null);
+            }}
             onKeySaved={retry}
           />
         </div>

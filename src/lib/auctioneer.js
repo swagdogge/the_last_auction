@@ -21,7 +21,7 @@ const BID_CALLS = [
   (money, name) => `I have ${money} with ${name}.`,
   (money, name) => `${money}, ${name} — thank you.`,
   (money, name) => `The bid is ${money}, ${name}.`,
-  (money, name) => `${money} — ${name} is in.`,
+  (money, name) => `${name} is in with ${money},`,
   (money, name) => `Now ${money} from ${name}.`,
 ];
 

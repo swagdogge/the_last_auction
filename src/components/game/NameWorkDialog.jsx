@@ -26,8 +26,7 @@ export default function NameWorkDialog({ number, onConfirm, onCancel }) {
           Name your work
         </h2>
         <p className="mt-3 text-center text-[12px] leading-relaxed text-foreground/65">
-          The saleroom will see this title alongside the painting. Leave it blank for an untitled
-          work.
+          Leave blank for an untitled work
         </p>
 
         <label

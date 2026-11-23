@@ -1,4 +1,4 @@
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useMemo, useRef, useState } from "react";
 import PaintCanvas from "@/components/game/PaintCanvas";
 import Palette from "@/components/game/Palette";
@@ -24,7 +24,7 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "The Last Auction — a life in three paintings" },
+      { title: "The Last Auction a life in three paintings" },
       {
         name: "description",
         content:
@@ -244,11 +244,9 @@ function Game() {
               >
                 Send to auction
               </button>
-              <p className="text-[11px] text-muted-foreground">
-                {demoMode && !pickedPreset
-                  ? "Choose a work first."
-                  : "Once it leaves the easel, it is out of your hands."}
-              </p>
+              {demoMode && !pickedPreset && (
+                <p className="text-[11px] text-muted-foreground">Choose a work first.</p>
+              )}
             </div>
             </div>
           </>
@@ -322,8 +320,8 @@ function TitleScreen({ onStart, onStartDemo }) {
         <div className="gold-rule mx-auto mt-8 h-px w-40" />
 
         <p className="mx-auto mt-8 max-w-xl text-center text-[15px] leading-relaxed text-foreground/70">
-          You have {PAINTING_COUNT} canvases and one lifetime. Paint each one, hand it to the
-          saleroom, and let six bidders with very particular taste decide what it is worth.
+          You have {PAINTING_COUNT} canvases left. Paint them, sell them, and watch six people with
+          very strong opinions argue about the price.
         </p>
       </div>
 
@@ -344,17 +342,9 @@ function TitleScreen({ onStart, onStartDemo }) {
           </button>
           <DemoButton onStart={onStartDemo} />
         </div>
-        <p className="text-center text-[11px] text-muted-foreground [text-shadow:0_0_2px_#000,0_1px_2px_#000]">
+        <p className="text-center text-[11px] text-muted-foreground [text-shadow:0_0_3px_#000,0_0_6px_#000,1px_1px_0_#000,-1px_1px_0_#000,1px_-1px_0_#000,-1px_-1px_0_#000,0_2px_4px_#000]">
           Vibecoded by swagdogge with Base44<br />during the &quot;Game Garage (Give(a)Go x Base44)&quot; Event<br />21.11.2026, Heilbronn<br />no squirrels harmed
         </p>
-        {import.meta.env.DEV && (
-          <Link
-            to="/standalone"
-            className="text-[10px] uppercase tracking-[0.2em] text-foreground/40 underline underline-offset-4"
-          >
-            Download the standalone project
-          </Link>
-        )}
       </div>
     </div>
   );
