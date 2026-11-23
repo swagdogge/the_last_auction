@@ -1,6 +1,6 @@
 # The Last Auction
  
-Paint three pictures. Sell them to six AI bidders with very strong opinions. Then listen to a documentary narrator solemnly interpret your life's work.
+Paint three pictures. Sell them to six AI bidders with very strong opinions. Then listen to a documentary narrator interpreting your life's work.
  
 **Play it:** https://the-last-auction.web.app/
  
