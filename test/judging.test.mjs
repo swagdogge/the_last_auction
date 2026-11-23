@@ -54,3 +54,25 @@ test("taste profiles pull bids in opposite directions", (t) => {
   assert.ok(bidFor(warm, "gordon") > bidFor(warm, "ines"));
   assert.ok(bidFor(landscape, "ines") > bidFor(landscape, "gordon"));
 });
+
+test("local prices stay in range instead of pinning to the ceiling", (t) => {
+  t.mock.method(Math, "random", () => 0.5);
+  const bids = judgePaintingLocally(
+    {
+      ...stats,
+      coverage: 0.9,
+      edge: 0.5,
+      symmetry: 0.8,
+      banding: 0.3,
+      variety: 2,
+      saturation: 0.9,
+      warm: 0.9,
+      cool: 0,
+      green: 0,
+    },
+    0,
+  ).map((verdict) => verdict.maxBid);
+
+  assert.ok(Math.max(...bids) <= LOCAL_JURY_MAX_BID * 0.85);
+  assert.ok(new Set(bids).size >= 4);
+});

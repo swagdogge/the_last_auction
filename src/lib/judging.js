@@ -12,15 +12,17 @@ function priceFor(score, ceiling) {
   return round250(ceiling * curve);
 }
 
+// Each taste profile stays under 1.0 at its strongest so a perfect fit is a
+// rare trophy lot instead of every bidder slamming into the same ceiling.
 const TASTE = {
-  gordon: (s) => clamp01(0.1 + s.warm * 1.1 + (s.coverage > 0.12 ? 0.12 : 0) - s.variety * 0.02),
+  gordon: (s) => clamp01(0.08 + s.warm * 0.72 + (s.coverage > 0.12 ? 0.1 : 0) - s.variety * 0.01),
   julian: (s) =>
-    clamp01(0.16 + (1 - s.coverage) * 0.72 + (s.variety <= 2 ? 0.26 : 0) + s.saturation * 0.22),
-  leopold: (s) => clamp01(0.08 + s.coverage * 0.52 + s.edge * 0.62 + s.symmetry * 0.26),
+    clamp01(0.12 + (1 - s.coverage) * 0.48 + (s.variety <= 2 ? 0.18 : 0) + s.saturation * 0.14),
+  leopold: (s) => clamp01(0.06 + s.coverage * 0.34 + s.edge * 0.4 + s.symmetry * 0.18),
   marguerite: (s) =>
-    clamp01(0.1 + s.edge * 0.5 + (1 - s.symmetry) * 0.42 + s.variety * 0.07 + (s.coverage > 0.04 ? 0.1 : 0)),
-  ines: (s) => clamp01(0.08 + s.banding * 0.62 + (s.cool + s.green) * 0.55 + (s.coverage > 0.18 ? 0.1 : 0)),
-  chad: (s) => clamp01(0.1 + s.saturation * 0.66 + (s.variety <= 2 ? 0.2 : 0) + s.coverage * 0.28),
+    clamp01(0.08 + s.edge * 0.32 + (1 - s.symmetry) * 0.28 + s.variety * 0.045 + (s.coverage > 0.04 ? 0.08 : 0)),
+  ines: (s) => clamp01(0.06 + s.banding * 0.4 + (s.cool + s.green) * 0.36 + (s.coverage > 0.18 ? 0.08 : 0)),
+  chad: (s) => clamp01(0.08 + s.saturation * 0.44 + (s.variety <= 2 ? 0.14 : 0) + s.coverage * 0.18),
 };
 
 const LINES = {
@@ -175,7 +177,7 @@ export function judgePaintingLocally(stats, paintingIndex) {
   const cov = coveragePhrase(stats.coverage);
 
   return BIDDERS.map((bidder) => {
-    const jitter = 0.9 + Math.random() * 0.2;
+    const jitter = 0.94 + Math.random() * 0.12;
     const score = clamp01(TASTE[bidder.id](stats) * jitter);
     const tier = tierOf(score);
     const line = pick(LINES[bidder.id][tier])
