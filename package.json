@@ -7,6 +7,7 @@
     "dev": "vite dev",
     "build": "vite build",
     "build:firebase": "vite build --config vite.config.firebase.js && node firebase/prepare.mjs",
+    "build:itch": "vite build --config vite.config.itch.js && node itch/prepare.mjs",
     "lint": "eslint . --quiet",
     "lint:fix": "eslint . --fix",
     "preview": "vite preview",

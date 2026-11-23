@@ -76,11 +76,19 @@ npm run dev -- --config vite.config.firebase.js
 ```
  
 Stop the local server:
- 
+
 ```bash
 pkill -f "vite dev --config vite.config.firebase.js"
 ```
- 
+
+## Build for itch.io
+
+```bash
+npm run build:itch
+```
+
+That writes `dist/the-last-auction-html5.zip`. Upload the zip to itch.io as an HTML5 game and tick "This game will be playable in browser". The zip contains `index.html`, relative asset paths, the license, and a short readme. No server needed.
+
 ## Credits
  
 - Painting palette: Kirb32 by Lospec, https://lospec.com/palette-list/kirb32
